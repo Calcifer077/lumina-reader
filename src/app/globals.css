@@ -5,11 +5,11 @@
 @theme inline {
   /* ================= Fonts ================= */
 
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-outfit), sans-serif;
 
-  --font-heading: var(--font-heading-family);
-  --font-body: var(--font-body-family);
-  --font-label: var(--font-label-family);
+  --font-heading: var(--font-outfit);
+  --font-body: var(--font-jakarta);
+  --font-label: var(--font-outfit);
 
   /* ================= Typography ================= */
 
@@ -140,9 +140,9 @@
      Typography
      ========================================================================== */
 
-  --font-heading: var(--font-literata);
-  --font-body: var(--font-inter);
-  --font-label: var(--font-inter);
+  --font-heading: var(--font-outfit);
+  --font-body: var(--font-jakarta);
+  --font-label: var(--font-outfit);
 
   --headline-lg-size: 30px;
   --headline-lg-leading: 38px;
@@ -248,9 +248,9 @@
      Typography
      ========================================================================== */
 
-  --font-heading: var(--font-literata);
-  --font-body: var(--font-inter);
-  --font-label: var(--font-inter);
+  --font-heading: var(--font-outfit);
+  --font-body: var(--font-jakarta);
+  --font-label: var(--font-outfit);
 
   --text-headline-xl: 40px;
   --leading-headline-xl: 48px;

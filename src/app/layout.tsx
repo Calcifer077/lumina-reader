@@ -1,22 +1,28 @@
 // app/layout.tsx
-
 import type { Metadata } from "next";
-import { Inter, Literata, Plus_Jakarta_Sans } from "next/font/google";
+import { Literata, Plus_Jakarta_Sans, Outfit } from "next/font/google";
 
 import "./globals.css";
 
-const inter = Inter({
+import Navbar from "@/app/_components/Navbar";
+import Sidebar from "@/app/_components/Sidebar";
+import { cn } from "@/lib/utils";
+
+// Outfit is the perfect lookalike for Google Sans / Product Sans
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-outfit",
   display: "swap",
 });
 
+// Plus Jakarta Sans is wonderfully soft, perfect for modern UI body text
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-jakarta",
   display: "swap",
 });
 
+// Google's official e-reader serif font
 const literata = Literata({
   subsets: ["latin"],
   variable: "--font-literata",
@@ -34,10 +40,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn("font-sans", outfit.variable)} // Set Outfit as default font-sans base
+    >
       <body
         className={`
-          ${inter.variable}
+          ${outfit.variable}
           ${jakarta.variable}
           ${literata.variable}
           min-h-screen
@@ -46,7 +56,11 @@ export default function RootLayout({
           antialiased
         `}
       >
-        {children}
+        <Navbar />
+        <aside className="pt-18">
+          <Sidebar />
+        </aside>
+        <main className="pt-32">{children}</main>
       </body>
     </html>
   );
