@@ -4,8 +4,8 @@ import { Literata, Plus_Jakarta_Sans, Outfit } from "next/font/google";
 
 import "./globals.css";
 
-import Navbar from "@/app/_components/Navbar";
-import Sidebar from "@/app/_components/Sidebar";
+import Navbar from "@/app/_components/ui/Navbar";
+import Sidebar from "@/app/_components/ui/Sidebar";
 import { cn } from "@/lib/utils";
 
 // Outfit is the perfect lookalike for Google Sans / Product Sans
@@ -60,7 +60,7 @@ export default function RootLayout({
         <aside className="pt-18">
           <Sidebar />
         </aside>
-        <main className="pt-32">{children}</main>
+        <main className="pl-54">{children}</main>
       </body>
     </html>
   );
