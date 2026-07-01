@@ -1,65 +1,81 @@
-"use client";
+import { Suspense } from "react";
 
-import { useState } from "react";
-import { MdGridView } from "react-icons/md";
-import { FaListUl } from "react-icons/fa";
+import GridViewSkeleton from "@/app/_components/home/GridViewSkeleton";
+import GridView from "@/app/_components/home/GridView";
+import Toolbar from "@/app/_components/home/Toolbar";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Book } from "@/app/_lib/types";
 
-const selectOptions = [
-  { text: "recently added", value: "recently_added" },
-  { text: "recently opened", value: "recently_opened" },
-  { text: "Title A-Z", value: "title_a-z" },
-  { text: "Title Z-A", value: "title_z-a" },
+const fakeBookData: Book[] = [
+  {
+    title: "Sharp Objects",
+    author: "Gillian Flynn",
+    image: "/sharp-objects-image.jpg",
+    type: "pdf",
+    progress: 0.5, // 50% progress
+  },
+  {
+    title: "Of Mice and Men",
+    author: "John Steinbeck",
+    image: "/of-mice-and-men-image.jpg",
+    type: "pdf",
+    progress: 0.1,
+  },
+  {
+    title: "Fake Book 3",
+    author: "Fake Author 3",
+    image: "/of-mice-and-men-image.jpg",
+    type: "pdf",
+    progress: 0.9,
+  },
+  {
+    title: "Fake Book 4",
+    author: "Fake Author 4",
+    image: "/of-mice-and-men-image.jpg",
+    type: "epub",
+    progress: 0,
+  },
+  {
+    title: "Fake Book 5",
+    author: "Fake Author 5",
+    image: "/of-mice-and-men-image.jpg",
+    type: "epub",
+    progress: 0,
+  },
+  {
+    title: "Fake Book 6",
+    author: "Fake Author 6",
+    image: "/of-mice-and-men-image.jpg",
+    type: "pdf",
+    progress: 0,
+  },
+  {
+    title: "Fake Book 7",
+    author: "Fake Author 7",
+    image: "/rebecca-image.jpg",
+    type: "pdf",
+    progress: 0,
+  },
+  {
+    title: "Fake Book 8",
+    author: "Fake Author 8",
+    // author:
+    // "The Heart of the Buddha's Teaching: Transforming Suffering into Peace, Joy, and Liberation",
+    image: "/rebecca-image.jpg",
+    type: "pdf",
+    progress: 0,
+  },
 ];
 
 export default function Home() {
-  const [value, setValue] = useState("recently_added");
-
   return (
     <div className="px-6 py-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">My Books</h1>
-          <h3 className="text-gray-500">Organized by recent activity</h3>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button className="text-gray-600 hover:text-black transition-colors">
-            <MdGridView size={24} />
-          </button>
-          <button className="text-gray-600 hover:text-black transition-colors">
-            <FaListUl size={24} />
-          </button>
-
-          <div>
-            <Select value={value} onValueChange={setValue}>
-              {/* Trigger Styles: No border, uppercase, centered text, custom color */}
-              <SelectTrigger className="w-48 border-none bg-transparent uppercase font-semibold text-primary focus:ring-0 focus:ring-offset-0 justify-center gap-2">
-                <SelectValue />
-              </SelectTrigger>
-
-              {/* Dropdown Menu Styles */}
-              <SelectContent className="bg-background border border-gray-100 shadow-md">
-                {selectOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="uppercase bg-background focus:bg-indigo-50 text-primary justify-center cursor-pointer font-medium"
-                  >
-                    {option.text}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+      <Toolbar />
+      {/* ALL THE BOOKS */}
+      <div className="mt-8">
+        <Suspense fallback={<GridViewSkeleton />}>
+          <GridView books={fakeBookData} />
+        </Suspense>
       </div>
     </div>
   );
