@@ -48,18 +48,16 @@ export default function Toolbar() {
 
       <div className="flex items-center gap-4">
         <button
-          className={`text-gray-600 ${view === "grid" ? "text-black" : "hover:text-black transition-colors"}`}
+          className={`${view === "grid" ? "text-black" : "hover:text-black text-gray-600 transition-colors"}`}
+          onClick={() => changeView("grid")}
         >
-          <button onClick={() => changeView("grid")}>
-            <MdGridView size={24} />
-          </button>
+          <MdGridView size={24} />
         </button>
         <button
-          className={`text-gray-600 ${view === "list" ? "text-black" : "hover:text-black transition-colors"}`}
+          className={`${view === "list" ? "text-black" : "text-gray-600  hover:text-black transition-colors"}`}
+          onClick={() => changeView("list")}
         >
-          <button onClick={() => changeView("list")}>
-            <FaListUl size={24} />
-          </button>
+          <FaListUl size={24} />
         </button>
 
         <div>
