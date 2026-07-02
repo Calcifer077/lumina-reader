@@ -8,7 +8,7 @@ function delay(ms: number) {
 
 export default async function GridView({ books }: { books: Book[] }) {
   // Simulate an async operation (e.g. fetching books)
-  await delay(3000);
+  // await delay(3000);
 
   return (
     <div className="grid grid-cols-4 gap-4">
