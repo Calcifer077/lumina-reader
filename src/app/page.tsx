@@ -2,6 +2,8 @@ import { Suspense } from "react";
 
 import GridViewSkeleton from "@/app/_components/home/GridViewSkeleton";
 import GridView from "@/app/_components/home/GridView";
+import ListViewSkeleton from "@/app/_components/home/ListViewSkeleton";
+import ListView from "@/app/_components/home/ListView";
 import Toolbar from "@/app/_components/home/Toolbar";
 
 import { Book } from "@/app/_lib/types";
@@ -74,7 +76,7 @@ const fakeBookData: Book[] = [
     coverUrl: "/of-mice-and-men-image.jpg",
     format: "pdf",
     progress: 0,
-    fileSize: 6291456, // 6 MB
+    fileSize: 6, // 6 MB
     totalPages: 198,
     uploadedAt: "2026-06-22T11:40:00Z",
     lastOpenedAt: null,
@@ -86,7 +88,7 @@ const fakeBookData: Book[] = [
     coverUrl: "/rebecca-image.jpg",
     format: "pdf",
     progress: 0,
-    fileSize: 8388608, // 8 MB
+    fileSize: 8, // 8 MB
     totalPages: 521,
     uploadedAt: "2026-06-25T08:10:00Z",
     lastOpenedAt: null,
@@ -105,15 +107,32 @@ const fakeBookData: Book[] = [
   },
 ];
 
-export default function Home() {
+type Props = {
+  searchParams: Promise<{
+    view?: "grid" | "list";
+    sort?: string;
+  }>;
+};
+
+export default async function Home({ searchParams }: Props) {
+  const { view = "grid" } = await searchParams;
+
   return (
     <div className="px-6 py-8">
       <Toolbar />
       {/* ALL THE BOOKS */}
-      <div className="mt-8 border rounded-md p-4">
-        <Suspense fallback={<GridViewSkeleton />}>
-          <GridView books={fakeBookData} />
-        </Suspense>
+      <div className="mt-8 border-border rounded-md p-4">
+        {view === "grid" && (
+          <Suspense fallback={<GridViewSkeleton />}>
+            <GridView books={fakeBookData} />
+          </Suspense>
+        )}
+
+        {view === "list" && (
+          <Suspense fallback={<ListViewSkeleton />}>
+            <ListView books={fakeBookData} />
+          </Suspense>
+        )}
       </div>
     </div>
   );
