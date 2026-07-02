@@ -107,53 +107,56 @@
   /* ==========================================================================
      Colors (Light)
      ========================================================================== */
+  /* ==========================================================================
+     Colors (Light) — vibrant reimagine
+     ========================================================================== */
 
-  --background: #f7f9fb;
-  --foreground: #191c1e;
+  --background: #fffbf5;
+  --foreground: #1f1a14;
 
-  --surface: #f7f9fb;
-  --surface-dim: #d8dadc;
-  --surface-bright: #f7f9fb;
+  --surface: #fffbf5;
+  --surface-dim: #e8ded0;
+  --surface-bright: #fffbf5;
 
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f2f4f6;
-  --surface-container: #eceef0;
-  --surface-container-high: #e6e8ea;
-  --surface-container-highest: #e0e3e5;
+  --surface-container-low: #fbf3e7;
+  --surface-container: #f5ecdc;
+  --surface-container-high: #efe4d0;
+  --surface-container-highest: #e9dcc4;
 
-  --surface-variant: #e0e3e5;
+  --surface-variant: #e9dcc4;
 
-  --on-surface: #191c1e;
-  --on-surface-variant: #424754;
+  --on-surface: #1f1a14;
+  --on-surface-variant: #52483a;
 
-  --primary: #0058be;
+  --primary: #e8720c;
   --on-primary: #ffffff;
-  --primary-container: #2170e4;
-  --on-primary-container: #fefcff;
+  --primary-container: #ffdbb8;
+  --on-primary-container: #5c2900;
 
-  --secondary: #505f76;
+  --secondary: #ab3d0f;
   --on-secondary: #ffffff;
-  --secondary-container: #d0e1fb;
-  --on-secondary-container: #54647a;
+  --secondary-container: #ffdbcc;
+  --on-secondary-container: #3c1000;
 
-  --tertiary: #924700;
+  --tertiary: #7a5c00;
   --on-tertiary: #ffffff;
-  --tertiary-container: #b75b00;
-  --on-tertiary-container: #fffbff;
+  --tertiary-container: #ffe28a;
+  --on-tertiary-container: #261a00;
 
   --error: #ba1a1a;
   --on-error: #ffffff;
   --error-container: #ffdad6;
   --on-error-container: #93000a;
 
-  --outline: #727785;
-  --outline-variant: #c2c6d6;
+  --outline: #8a7d68;
+  --outline-variant: #ddcdb0;
 
-  --inverse-surface: #2d3133;
-  --inverse-on-surface: #eff1f3;
-  --inverse-primary: #adc6ff;
+  --inverse-surface: #34291d;
+  --inverse-on-surface: #fdefe0;
+  --inverse-primary: #ffb870;
 
-  --surface-tint: #005ac2;
+  --surface-tint: #e8720c;
 
   /* ==========================================================================
      Typography
@@ -216,52 +219,52 @@
      Colors (Dark)
      ========================================================================== */
 
-  --background: #10131a;
-  --foreground: #e1e2ec;
+  --background: #191410;
+  --foreground: #f3e6d8;
 
-  --surface: #10131a;
-  --surface-dim: #10131a;
-  --surface-bright: #363941;
+  --surface: #191410;
+  --surface-dim: #191410;
+  --surface-bright: #443729;
 
-  --surface-container-lowest: #0b0e15;
-  --surface-container-low: #191b23;
-  --surface-container: #1d2027;
-  --surface-container-high: #272a31;
-  --surface-container-highest: #32353c;
+  --surface-container-lowest: #120e0a;
+  --surface-container-low: #221b14;
+  --surface-container: #29201a;
+  --surface-container-high: #342a20;
+  --surface-container-highest: #40342a;
 
-  --surface-variant: #32353c;
+  --surface-variant: #40342a;
 
-  --on-surface: #e1e2ec;
-  --on-surface-variant: #c2c6d6;
+  --on-surface: #f3e6d8;
+  --on-surface-variant: #dcc4a8;
 
-  --primary: #adc6ff;
-  --on-primary: #002e6a;
-  --primary-container: #4d8eff;
-  --on-primary-container: #00285d;
+  --primary: #ffb870;
+  --on-primary: #4a2500;
+  --primary-container: #cf6e00;
+  --on-primary-container: #3a1c00;
 
-  --secondary: #b1c6f9;
-  --on-secondary: #182f59;
-  --secondary-container: #304671;
-  --on-secondary-container: #9fb5e7;
+  --secondary: #ffb59c;
+  --on-secondary: #5c1c05;
+  --secondary-container: #8a3211;
+  --on-secondary-container: #ffdbcc;
 
-  --tertiary: #ffb786;
-  --on-tertiary: #502400;
-  --tertiary-container: #df7412;
-  --on-tertiary-container: #461f00;
+  --tertiary: #ffd857;
+  --on-tertiary: #3f2e00;
+  --tertiary-container: #5c4500;
+  --on-tertiary-container: #ffe28a;
 
   --error: #ffb4ab;
   --on-error: #690005;
   --error-container: #93000a;
   --on-error-container: #ffdad6;
 
-  --outline: #8c909f;
-  --outline-variant: #424754;
+  --outline: #a3907a;
+  --outline-variant: #524334;
 
-  --inverse-surface: #e1e2ec;
-  --inverse-on-surface: #2e3038;
-  --inverse-primary: #005ac2;
+  --inverse-surface: #f3e6d8;
+  --inverse-on-surface: #34291d;
+  --inverse-primary: #a15200;
 
-  --surface-tint: #adc6ff;
+  --surface-tint: #ffb870;
 
   /* ==========================================================================
      Typography
