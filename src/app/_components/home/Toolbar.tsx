@@ -43,23 +43,40 @@ export default function Toolbar() {
   return (
     <div className="flex justify-between items-center">
       <div>
-        <h1 className="text-2xl font-bold">My Books</h1>
-        <h3 className="text-gray-500">Organized by recent activity</h3>
+        <h1 className="text-headline-md font-heading font-bold text-on-surface">
+          My Books
+        </h1>
+        <h3 className="text-body-sm text-on-surface-variant">
+          Organized by recent activity
+        </h3>
       </div>
 
       <div className="flex items-center gap-4">
-        <button
-          className={`${view === "grid" ? "text-black" : "hover:text-black text-gray-600 transition-colors"}`}
-          onClick={() => changeView("grid")}
-        >
-          <MdGridView size={24} />
-        </button>
-        <button
-          className={`${view === "list" ? "text-black" : "text-gray-600 hover:text-black transition-colors"}`}
-          onClick={() => changeView("list")}
-        >
-          <FaListUl size={24} />
-        </button>
+        <div className="flex items-center gap-1 bg-surface-container-low rounded-lg p-1 border border-outline-variant">
+          <button
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
+              view === "grid"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
+            }`}
+            onClick={() => changeView("grid")}
+          >
+            <MdGridView size={18} />
+            <span>Grid</span>
+          </button>
+
+          <button
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
+              view === "list"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
+            }`}
+            onClick={() => changeView("list")}
+          >
+            <FaListUl size={18} />
+            <span>List</span>
+          </button>
+        </div>
 
         <CustomSelect
           value={value}

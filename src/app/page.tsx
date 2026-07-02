@@ -72,7 +72,7 @@ export default function Home() {
     <div className="px-6 py-8">
       <Toolbar />
       {/* ALL THE BOOKS */}
-      <div className="mt-8">
+      <div className="mt-8 border rounded-md p-4">
         <Suspense fallback={<GridViewSkeleton />}>
           <GridView books={fakeBookData} />
         </Suspense>
