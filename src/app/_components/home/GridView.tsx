@@ -12,23 +12,23 @@ export default async function GridView({ books }: { books: Book[] }) {
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      {books.map((book, index) => (
-        <div key={index} className="group mb-8 w-full">
+      {books.map((book) => (
+        <div key={book.id} className="group mb-8 w-full">
           <div className="aspect-4/5 w-full relative rounded-xl overflow-hidden">
             <Image
-              src={book.image}
+              src={book.coverUrl}
               alt={book.title}
               fill
               className="object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
             />
             <div
               className={`absolute top-2 right-2 z-10 px-2 py-0.5 rounded-full text-label-sm font-label uppercase tracking-wide ${
-                book.type === "pdf"
+                book.format === "pdf"
                   ? "bg-tertiary-container text-on-tertiary-container"
                   : "bg-secondary-container text-on-secondary-container"
               }`}
             >
-              {book.type}
+              {book.format}
             </div>
             {book.progress > 0 && (
               <div className="absolute bottom-0 left-0 w-full h-1 bg-surface-container-highest">
