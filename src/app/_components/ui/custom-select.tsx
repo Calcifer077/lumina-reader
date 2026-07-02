@@ -59,7 +59,7 @@ export default function CustomSelect({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="w-48 flex items-center justify-center gap-2 uppercase font-semibold text-primary cursor-pointer bg-transparent"
+        className="w-48 flex items-center justify-center gap-2 uppercase font-normal text-primary cursor-pointer bg-transparent"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -81,7 +81,7 @@ export default function CustomSelect({
               role="option"
               aria-selected={option.value === value}
               onClick={() => handleSelect(option.value)}
-              className={`px-4 py-2 text-center uppercase font-medium cursor-pointer text-primary hover:bg-indigo-50 ${
+              className={`px-4 py-2 text-center uppercase font-normal cursor-pointer text-primary hover:bg-indigo-50 ${
                 option.value === value ? "bg-indigo-50" : ""
               }`}
             >

@@ -54,7 +54,7 @@ export default function Toolbar() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1 bg-surface-container-low rounded-lg p-1 border border-outline-variant">
           <button
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
+            className={`flex items-center px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
               view === "grid"
                 ? "bg-primary-container text-on-primary-container"
                 : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
@@ -62,11 +62,10 @@ export default function Toolbar() {
             onClick={() => changeView("grid")}
           >
             <MdGridView size={18} />
-            <span>Grid</span>
           </button>
 
           <button
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
+            className={`flex items-center px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
               view === "list"
                 ? "bg-primary-container text-on-primary-container"
                 : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
@@ -74,7 +73,6 @@ export default function Toolbar() {
             onClick={() => changeView("list")}
           >
             <FaListUl size={18} />
-            <span>List</span>
           </button>
         </div>
 
