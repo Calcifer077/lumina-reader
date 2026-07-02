@@ -22,7 +22,7 @@ export default async function GridView({ books }: { books: Book[] }) {
               className="object-cover cursor-pointer"
             />
             <div
-              className={`absolute top-2 right-2 z-50 px-2 py-0.5 rounded-full text-label-sm font-label uppercase tracking-wide ${
+              className={`absolute top-2 right-2 z-10 px-2 py-0.5 rounded-full text-label-sm font-label uppercase tracking-wide ${
                 book.type === "pdf"
                   ? "bg-tertiary-container text-on-tertiary-container"
                   : "bg-secondary-container text-on-secondary-container"

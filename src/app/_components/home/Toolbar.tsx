@@ -3,13 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import CustomSelect from "@/app/_components/ui/custom-select";
 
 import { MdGridView } from "react-icons/md";
 import { FaListUl } from "react-icons/fa";
@@ -28,13 +22,20 @@ export default function Toolbar() {
   const [value, setValue] = useState("recently_added");
   const [view, setView] = useState(searchParams.get("view") || "grid");
 
-  console.log("Current view:", view);
-
   function changeView(view: "grid" | "list") {
     const params = new URLSearchParams(searchParams);
     params.set("view", view);
 
     setView(view);
+
+    router.push(`?${params.toString()}`);
+  }
+
+  function changeValue(value: string) {
+    const params = new URLSearchParams(searchParams);
+    params.set("sort", value);
+
+    setValue(value);
 
     router.push(`?${params.toString()}`);
   }
@@ -54,33 +55,17 @@ export default function Toolbar() {
           <MdGridView size={24} />
         </button>
         <button
-          className={`${view === "list" ? "text-black" : "text-gray-600  hover:text-black transition-colors"}`}
+          className={`${view === "list" ? "text-black" : "text-gray-600 hover:text-black transition-colors"}`}
           onClick={() => changeView("list")}
         >
           <FaListUl size={24} />
         </button>
 
-        <div>
-          <Select value={value} onValueChange={setValue}>
-            {/* Trigger Styles: No border, uppercase, centered text, custom color */}
-            <SelectTrigger className="w-48 border-none bg-transparent uppercase font-semibold text-primary focus:ring-0 focus:ring-offset-0 justify-center gap-2">
-              <SelectValue />
-            </SelectTrigger>
-
-            {/* Dropdown Menu Styles */}
-            <SelectContent className="bg-background border border-gray-100 shadow-md">
-              {selectOptions.map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  className="uppercase bg-background focus:bg-indigo-50 text-primary justify-center cursor-pointer font-medium"
-                >
-                  {option.text}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <CustomSelect
+          value={value}
+          onValueChange={changeValue}
+          options={selectOptions}
+        />
       </div>
     </div>
   );
