@@ -41,8 +41,9 @@ export default function Toolbar() {
   }
 
   return (
-    <div className="flex justify-between items-center">
-      <div>
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-4">
+      {/* Heading */}
+      <div className="w-full text-left md:w-auto">
         <h1 className="text-headline-md font-heading font-bold text-on-surface">
           My Books
         </h1>
@@ -51,10 +52,12 @@ export default function Toolbar() {
         </h3>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1 bg-surface-container-low rounded-lg p-1 border border-outline-variant">
+      {/* Controls */}
+      <div className="flex w-full items-center gap-3 md:w-auto md:justify-end">
+        {/* Grid/List Toggle */}
+        <div className="flex items-center rounded-lg border border-outline-variant bg-surface-container-low p-1 shadow-sm">
           <button
-            className={`flex items-center px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
+            className={`flex items-center rounded-md px-3 py-2 transition-colors ${
               view === "grid"
                 ? "bg-primary-container text-on-primary-container"
                 : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
@@ -65,7 +68,7 @@ export default function Toolbar() {
           </button>
 
           <button
-            className={`flex items-center px-3 py-1.5 rounded-md text-body-sm font-medium transition-colors ${
+            className={`flex items-center rounded-md px-3 py-2 transition-colors ${
               view === "list"
                 ? "bg-primary-container text-on-primary-container"
                 : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
@@ -76,11 +79,14 @@ export default function Toolbar() {
           </button>
         </div>
 
-        <CustomSelect
-          value={value}
-          onValueChange={changeValue}
-          options={selectOptions}
-        />
+        {/* Sort */}
+        <div className="flex-1 md:flex-none">
+          <CustomSelect
+            value={value}
+            onValueChange={changeValue}
+            options={selectOptions}
+          />
+        </div>
       </div>
     </div>
   );

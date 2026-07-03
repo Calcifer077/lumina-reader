@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+
 import { IoMdCloudUpload } from "react-icons/io";
 import { MdOutlineSettings } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
@@ -15,12 +16,12 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 flex justify-between items-center w-full h-18 px-4 bg-background border-b border-border z-50">
-        <div className="font-extrabold uppercase text-primary tracking-normal text-xl">
+        <div className="font-extrabold uppercase text-primary tracking-normal text-lg md:text-xl">
           Lumina Reader
         </div>
 
         <div className="flex space-x-4 items-center">
-          <div className="relative">
+          <div className="hidden relative lg:flex">
             <CiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2" />
             <Input
               placeholder="Search your library..."
@@ -34,7 +35,7 @@ export default function Navbar() {
             <div>
               <IoMdCloudUpload />
             </div>
-            <div className="tracking-wide">Upload Book</div>
+            <div className="hidden tracking-wide lg:flex">Upload Book</div>
           </div>
           <div className="flex items-center space-x-1">
             <MdOutlineSettings className="w-8 h-8" />

@@ -60,7 +60,7 @@ export default function RootLayout({
         <aside className="pt-18">
           <Sidebar />
         </aside>
-        <main className="pl-54">{children}</main>
+        <main className="lg:pl-54">{children}</main>
       </body>
     </html>
   );

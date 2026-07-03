@@ -77,10 +77,10 @@ export default function UploadDocumentsModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4 backdrop-blur-lg">
       <div
         ref={modalRef}
-        className="w-full max-w-[520px] rounded-lg bg-surface-lowest"
+        className="w-full max-w-130 rounded-lg bg-surface-lowest"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant">

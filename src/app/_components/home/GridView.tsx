@@ -8,10 +8,10 @@ function delay(ms: number) {
 
 export default async function GridView({ books }: { books: Book[] }) {
   // Simulate an async operation (e.g. fetching books)
-  // await delay(3000);
+  await delay(3000);
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {books.map((book) => (
         <div key={book.id} className="group mb-8 w-full">
           <div className="aspect-4/5 w-full relative rounded-xl overflow-hidden">
