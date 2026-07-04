@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "8bd45264-2f74-4063-b79c-f7a46af58270",
+  "id": "aa7c3f75-6223-4094-80c8-1d7556444dd5",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -66,6 +66,19 @@
       "generated": null,
       "identity": null,
       "name": "format",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "books"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id_from_storage",
       "entityType": "columns",
       "schema": "public",
       "table": "books"
@@ -236,6 +249,17 @@
       "schema": "public",
       "table": "reading_progress",
       "entityType": "pks"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "id_from_storage"
+      ],
+      "nullsNotDistinct": false,
+      "name": "books_id_from_storage_key",
+      "schema": "public",
+      "table": "books",
+      "entityType": "uniques"
     }
   ],
   "renames": []

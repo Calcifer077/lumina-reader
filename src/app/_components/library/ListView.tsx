@@ -1,13 +1,13 @@
 import Image from "next/image";
 
-import { Book } from "@/app/_lib/types";
+import type { BookFromApi } from "@/app/_lib/types";
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default async function ListView({ books }: { books: Book[] }) {
-  await delay(3000);
+export default async function ListView({ books }: { books: BookFromApi[] }) {
+  // await delay(3000);
 
   return (
     <div className="w-full">

@@ -5,6 +5,7 @@ export const books = pgTable("books", {
   title: text("title").notNull(),
   author: text("author"),
   format: text("format", { enum: ["pdf", "epub"] }).notNull(),
+  id_from_storage: text('id_from_storage').notNull().unique(),
   file_path: text("file_path").notNull(), // path in Supabase Storage
   cover_url: text("cover_url"), // optional extracted cover
   file_size: integer("file_size"), // in bytes

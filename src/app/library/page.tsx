@@ -7,9 +7,9 @@ import ListView from "@/app/_components/library/ListView";
 import Toolbar from "@/app/_components/library/Toolbar";
 import EmptyLibrary from "@/app/_components/library/EmptyLibrary";
 
-import { Book } from "@/app/_lib/types";
+import type { BookFromApi } from "@/app/_lib/types";
 
-const fakeBookData: Book[] = [
+const fakeBookData: BookFromApi[] = [
   {
     id: "1",
     title: "Sharp Objects",

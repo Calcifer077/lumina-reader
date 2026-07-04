@@ -3,6 +3,7 @@ CREATE TABLE "books" (
 	"title" text NOT NULL,
 	"author" text,
 	"format" text NOT NULL,
+	"id_from_storage" text NOT NULL UNIQUE,
 	"file_path" text NOT NULL,
 	"cover_url" text,
 	"file_size" integer,

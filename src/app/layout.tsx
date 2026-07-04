@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Literata, Plus_Jakarta_Sans, Outfit } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
@@ -54,7 +55,25 @@ export default function RootLayout({
           antialiased
         `}
       >
-        {children}
+        <main>{children}</main>
+        <Toaster
+          richColors
+          toastOptions={{
+            classNames: {
+              toast:
+                "bg-surface-container text-on-surface border-outline-variant font-body",
+              warning:
+                "bg-secondary-container text-on-secondary-container border-secondary",
+              error: "bg-error-container text-on-error-container border-error",
+              success:
+                "bg-tertiary-container text-on-tertiary-container border-tertiary",
+              info: "bg-primary-container text-on-primary-container border-primary",
+              description: "text-on-surface-variant",
+              actionButton: "bg-primary text-primary-foreground",
+              cancelButton: "bg-surface-high text-on-surface-variant",
+            },
+          }}
+        />
       </body>
     </html>
   );
