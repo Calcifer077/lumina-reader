@@ -1,13 +1,15 @@
 "use client";
 
 import { JSX, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { X, UploadCloud, FileText, CheckCircle2, XCircle } from "lucide-react";
+
 import { useOnClickOutside } from "@/app/_lib/hooks/useOnClickOutisde";
 import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
 import type { ApiResponse } from "@/app/_lib/types";
 import type { Book } from "@/app/_lib/types";
-import { toast } from "sonner";
+import { getExtension, formatSize, stripExtension } from "@/app/_lib/utils";
 
 type FileStatus = "waiting" | "uploading" | "complete" | "error";
 
@@ -21,24 +23,8 @@ interface UploadFile {
   error?: string;
 }
 
-const MAX_SIZE_MB = 50;
+const MAX_SIZE_MB: number = Number(process.env.MAX_SIZE_MB) || 50;
 const ALLOWED_EXTENSIONS = ["pdf", "epub"];
-
-function formatSize(bytes: number): string {
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function getExtension(filename: string): string {
-  const parts = filename.split(".");
-  return parts[parts.length - 1]?.toLowerCase() ?? "";
-}
-
-function stripExtension(filename: string): string {
-  const parts = filename.split(".");
-  if (parts.length <= 1) return filename;
-  parts.pop();
-  return parts.join(".");
-}
 
 interface UploadDocumentsModalProps {
   open?: boolean;

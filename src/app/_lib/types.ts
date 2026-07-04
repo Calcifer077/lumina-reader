@@ -19,7 +19,7 @@ export type BookFromApi = {
   coverUrl: string;
   format: string;
   progress: number;
-  fileSize: number;
+  fileSize: string;
   totalPages: number;
   uploadedAt: string;
   lastOpenedAt: string | null;
