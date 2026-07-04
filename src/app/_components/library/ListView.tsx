@@ -76,7 +76,7 @@ export default async function ListView({ books }: { books: BookFromApi[] }) {
               </span>
 
               <span className="text-sm text-muted-foreground">
-                {book.fileSize} MB
+                {book.fileSize}
               </span>
 
               <span className="text-sm text-muted-foreground">
