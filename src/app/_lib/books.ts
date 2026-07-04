@@ -1,4 +1,5 @@
 import { PDFParse } from "pdf-parse";
+import { count } from "drizzle-orm";
 import EPub from "epub2";
 import { writeFile, unlink } from "fs/promises";
 import { tmpdir } from "os";
@@ -6,9 +7,16 @@ import path from "path";
 import { randomUUID } from "crypto";
 
 import { db } from "@/app/_lib/db";
-import { books } from "@/app/_db/schema";
 import type { BookFromApi } from "@/app/_lib/types";
 import { formatSize, formatDate } from "@/app/_lib/utils";
+
+import { books } from "@/app/_db/schema";
+
+export async function getTotalBooks(): Promise<number> {
+  const [data] = await db.select({ total: count() }).from(books);
+
+  return data.total;
+}
 
 export async function getBooks(): Promise<BookFromApi[]> {
   const data = await db.select().from(books);

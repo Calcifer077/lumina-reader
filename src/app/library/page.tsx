@@ -1,10 +1,13 @@
 import { Suspense } from "react";
 
-import { getBooks } from "@/app/_lib/books";
-import GridViewSkeleton from "@/app/_components/library/GridViewSkeleton";
+import { getBooks, getTotalBooks } from "@/app/_lib/books";
+
 import GridView from "@/app/_components/library/GridView";
-import ListViewSkeleton from "@/app/_components/library/ListViewSkeleton";
+import GridViewSkeleton from "@/app/_components/library/GridViewSkeleton";
+
 import ListView from "@/app/_components/library/ListView";
+import ListViewSkeleton from "@/app/_components/library/ListViewSkeleton";
+
 import Toolbar from "@/app/_components/library/Toolbar";
 import EmptyLibrary from "@/app/_components/library/EmptyLibrary";
 
@@ -19,30 +22,32 @@ type Props = {
 
 export default async function LibraryPage({ searchParams }: Props) {
   const { view = "grid" } = await searchParams;
-  const books = await getBooks();
+  const totalBooks = await getTotalBooks();
+
+  const booksPromise = getBooks();
 
   return (
     <div className="px-2 py-4 lg:px-6 lg:py-8 mb-12">
-      {books.length > 0 && (
+      {totalBooks > 0 && (
         <>
           <Toolbar />
           <div className="mt-6 p-4">
             {/* ALL THE BOOKS */}
             {view === "grid" && (
               <Suspense fallback={<GridViewSkeleton />}>
-                <GridView books={books} />
+                <GridView booksPromise={booksPromise} />
               </Suspense>
             )}
 
             {view === "list" && (
               <Suspense fallback={<ListViewSkeleton />}>
-                <ListView books={books} />
+                <ListView booksPromise={booksPromise} />
               </Suspense>
             )}
           </div>
         </>
       )}
-      {books.length == 0 && (
+      {totalBooks == 0 && (
         <div className="p-4">
           <EmptyLibrary />
         </div>

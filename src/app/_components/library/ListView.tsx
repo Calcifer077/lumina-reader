@@ -1,13 +1,14 @@
+import { use } from "react";
 import Image from "next/image";
 
 import type { BookFromApi } from "@/app/_lib/types";
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export default async function ListView({ books }: { books: BookFromApi[] }) {
-  // await delay(3000);
+export default function ListView({
+  booksPromise,
+}: {
+  booksPromise: Promise<BookFromApi[]>;
+}) {
+  const books = use(booksPromise);
 
   return (
     <div className="w-full">

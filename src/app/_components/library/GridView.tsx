@@ -1,14 +1,14 @@
+import { use } from "react";
 import Image from "next/image";
 
 import type { BookFromApi } from "@/app/_lib/types";
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export default async function GridView({ books }: { books: BookFromApi[] }) {
-  // Simulate an async operation (e.g. fetching books)
-  // await delay(3000);
+export default function GridView({
+  booksPromise,
+}: {
+  booksPromise: Promise<BookFromApi[]>;
+}) {
+  const books = use(booksPromise);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
