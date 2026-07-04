@@ -1,14 +1,39 @@
-import { use } from "react";
 import Image from "next/image";
 
 import type { BookFromApi } from "@/app/_lib/types";
 
-export default function ListView({
+export default async function ListView({
   booksPromise,
+  sort,
 }: {
   booksPromise: Promise<BookFromApi[]>;
+  sort: string;
 }) {
-  const books = use(booksPromise);
+  const books = await booksPromise;
+
+  const sortedBooks = [...books].sort((a, b) => {
+    switch (sort) {
+      case "recently_added":
+        return (
+          new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+        );
+
+      case "recently_opened":
+        return (
+          new Date(b.lastOpenedAt ?? "1970-01-01").getTime() -
+          new Date(a.lastOpenedAt ?? "1970-01-01").getTime()
+        );
+
+      case "title_a-z":
+        return a.title.localeCompare(b.title);
+
+      case "title_z-a":
+        return b.title.localeCompare(a.title);
+
+      default:
+        return 0;
+    }
+  });
 
   return (
     <div className="w-full">
@@ -29,7 +54,7 @@ export default function ListView({
       </div>
 
       <div className="divide-y divide-border">
-        {books.map((book) => (
+        {sortedBooks.map((book) => (
           <div
             key={book.id}
             className="

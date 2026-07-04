@@ -1,18 +1,43 @@
-import { use } from "react";
 import Image from "next/image";
 
 import type { BookFromApi } from "@/app/_lib/types";
 
-export default function GridView({
+export default async function GridView({
   booksPromise,
+  sort,
 }: {
   booksPromise: Promise<BookFromApi[]>;
+  sort: string;
 }) {
-  const books = use(booksPromise);
+  const books = await booksPromise;
+
+  const sortedBooks = [...books].sort((a, b) => {
+    switch (sort) {
+      case "recently_added":
+        return (
+          new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+        );
+
+      case "recently_opened":
+        return (
+          new Date(b.lastOpenedAt ?? "1970-01-01").getTime() -
+          new Date(a.lastOpenedAt ?? "1970-01-01").getTime()
+        );
+
+      case "title_a-z":
+        return a.title.localeCompare(b.title);
+
+      case "title_z-a":
+        return b.title.localeCompare(a.title);
+
+      default:
+        return 0;
+    }
+  });
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {books.map((book) => (
+      {sortedBooks.map((book) => (
         <div key={book.id} className="group mb-8 w-full">
           <div className="aspect-4/5 w-full relative rounded-xl overflow-hidden">
             <Image

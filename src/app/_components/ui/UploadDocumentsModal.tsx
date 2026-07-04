@@ -153,7 +153,7 @@ export default function UploadDocumentsModal({
     }
 
     setIsSubmitting(false);
-    router.refresh();
+    // router.refresh();
   }
 
   if (!open) return null;

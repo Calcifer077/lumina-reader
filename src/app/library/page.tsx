@@ -9,6 +9,7 @@ import ListView from "@/app/_components/library/ListView";
 import ListViewSkeleton from "@/app/_components/library/ListViewSkeleton";
 
 import Toolbar from "@/app/_components/library/Toolbar";
+import ToolbarSkeleton from "@/app/_components/library/ToolbarSkeleton";
 import EmptyLibrary from "@/app/_components/library/EmptyLibrary";
 
 // import type { BookFromApi } from "@/app/_lib/types";
@@ -21,7 +22,8 @@ type Props = {
 };
 
 export default async function LibraryPage({ searchParams }: Props) {
-  const { view = "grid" } = await searchParams;
+  const { view = "grid", sort = "recently_added" } = await searchParams;
+  console.log(sort);
   const totalBooks = await getTotalBooks();
 
   const booksPromise = getBooks();
@@ -30,18 +32,20 @@ export default async function LibraryPage({ searchParams }: Props) {
     <div className="px-2 py-4 lg:px-6 lg:py-8 mb-12">
       {totalBooks > 0 && (
         <>
-          <Toolbar />
+          <Suspense fallback={<ToolbarSkeleton />}>
+            <Toolbar />
+          </Suspense>
           <div className="mt-6 p-4">
             {/* ALL THE BOOKS */}
             {view === "grid" && (
               <Suspense fallback={<GridViewSkeleton />}>
-                <GridView booksPromise={booksPromise} />
+                <GridView booksPromise={booksPromise} sort={sort} />
               </Suspense>
             )}
 
             {view === "list" && (
               <Suspense fallback={<ListViewSkeleton />}>
-                <ListView booksPromise={booksPromise} />
+                <ListView booksPromise={booksPromise} sort={sort} />
               </Suspense>
             )}
           </div>
