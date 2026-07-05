@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import type { BookFromApi } from "@/app/_lib/types";
 
@@ -38,7 +39,11 @@ export default async function GridView({
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {sortedBooks.map((book) => (
-        <div key={book.id} className="group mb-8 w-full">
+        <Link
+          href={`/book/${book.id}`}
+          key={book.id}
+          className="group mb-8 w-full"
+        >
           <div className="aspect-4/5 w-full relative rounded-xl overflow-hidden">
             <Image
               src={book.coverUrl}
@@ -70,7 +75,7 @@ export default async function GridView({
           <div className="h-4 mt-2 text-on-surface-variant text-body-sm">
             {book.author}
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

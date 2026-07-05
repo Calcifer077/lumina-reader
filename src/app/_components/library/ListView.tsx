@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import type { BookFromApi } from "@/app/_lib/types";
 
@@ -55,7 +56,8 @@ export default async function ListView({
 
       <div className="divide-y divide-border">
         {sortedBooks.map((book) => (
-          <div
+          <Link
+            href={`/book/${book.id}`}
             key={book.id}
             className="
             group
@@ -130,7 +132,7 @@ export default async function ListView({
             <span className="hidden md:block text-body-sm text-on-surface-variant">
               {book.uploadedAt}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

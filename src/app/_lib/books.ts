@@ -1,5 +1,7 @@
+"use server";
+
 import { PDFParse } from "pdf-parse";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import EPub from "epub2";
 import { writeFile, unlink } from "fs/promises";
 import { tmpdir } from "os";
@@ -11,6 +13,7 @@ import type { BookFromApi } from "@/app/_lib/types";
 import { formatSize, formatDate } from "@/app/_lib/utils";
 
 import { books } from "@/app/_db/schema";
+import { supabase } from "./supabase";
 
 export async function getTotalBooks(): Promise<number> {
   const [data] = await db.select({ total: count() }).from(books);
@@ -26,11 +29,19 @@ export async function getBooks(): Promise<BookFromApi[]> {
   const res: BookFromApi[] = [];
 
   for (const obj of data) {
+    let cover = "";
+    if (obj.cover_url) {
+      const imageUrl = await supabase.storage
+        .from("books")
+        .createSignedUrl(obj.cover_url, 60 * 60);
+
+      if (imageUrl?.data) cover = imageUrl?.data.signedUrl;
+    }
     const newObj: BookFromApi = {
       id: obj.id,
       title: obj.title || "",
       author: obj.author || "",
-      coverUrl: obj.cover_url || "/placeholder-book.png",
+      coverUrl: cover || "/placeholder-book.png",
       format: obj.format,
       progress: 0,
       fileSize: formatSize(obj.file_size),
@@ -45,13 +56,128 @@ export async function getBooks(): Promise<BookFromApi[]> {
   return res;
 }
 
-export async function getBook() {}
+export async function getBook(id: string): Promise<BookFromApi> {
+  const [data] = await db.select().from(books).where(eq(books.id, id));
+  let cover = "";
+  if (data.cover_url) {
+    const imageUrl = await supabase.storage
+      .from("books")
+      .createSignedUrl(data.cover_url, 60 * 60);
 
-export async function changeBookImage() {}
+    if (imageUrl?.data) cover = imageUrl?.data.signedUrl;
+  }
 
-export async function updateBook() {}
+  const res: BookFromApi = {
+    id: data.id,
+    title: data.title,
+    author: data.author || "",
+    coverUrl: cover || "/placeholder-book.png",
+    format: data.format,
+    progress: 0,
+    fileSize: formatSize(data.file_size),
+    totalPages: data.total_pages || 0,
+    uploadedAt: formatDate(data.uploaded_at),
+    lastOpenedAt: formatDate(data.last_opened_at),
+  };
 
-export async function deleteBook() {}
+  return res;
+}
+
+async function getBookStorageId(id: string): Promise<string | boolean> {
+  const [data] = await db
+    .select({ idFromStorage: books.id_from_storage })
+    .from(books)
+    .where(eq(books.id, id));
+
+  return data.idFromStorage;
+}
+
+export async function updateBookImage(
+  bookId: string,
+  file: File,
+): Promise<boolean> {
+  try {
+    const idFromStorage = await getBookStorageId(bookId);
+
+    const safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const filePath = `${idFromStorage}/${safeFilename}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("books")
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.log("Error while uploading the file", uploadError);
+      return false;
+    }
+
+    await db
+      .update(books)
+      .set({
+        cover_url: filePath,
+      })
+      .where(eq(books.id, bookId));
+
+    return true;
+  } catch (err) {
+    console.error("Error occured while updating cover image", err);
+
+    return false;
+  }
+}
+
+/**
+ * Updates books in database
+ *
+ * @param id
+ * @param title
+ * @param author
+ * @returns a boolean depending on whether the operation was successful or not
+ */
+export async function updateBook(
+  id: string,
+  title: string,
+  author: string,
+): Promise<boolean> {
+  try {
+    if (title.trim().length === 0 || author.trim().length === 0) return false;
+
+    await db
+      .update(books)
+      .set({
+        title: title,
+        author: author,
+      })
+      .where(eq(books.id, id));
+
+    return true;
+  } catch (err) {
+    console.error("Error while updating book", err);
+    return false;
+  }
+}
+
+/**
+ * Deletes books from database
+ *
+ * @param id
+ * @return a boolean depending on whether the operation was successful or not
+ *
+ */
+export async function deleteBook(id: string): Promise<boolean> {
+  try {
+    await db.delete(books).where(eq(books.id, id));
+    return true;
+  } catch (err) {
+    console.error("Error while deleting book", err);
+    return false;
+  }
+}
 
 /**
  *
