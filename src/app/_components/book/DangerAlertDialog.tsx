@@ -30,7 +30,7 @@ export default function DangerAlertDialog({
       <AlertDialogTrigger asChild>
         <button
           className={`h-11 px-4 rounded-md whitespace-nowrap cursor-pointer hover:opacity-90 ${additionalClassesForButton}`}
-          disabled
+          disabled={disabled}
         >
           {title}
         </button>
