@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MoveLeft, Upload, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,8 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
   const [isMutating, setIsMutating] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const router = useRouter();
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -37,8 +40,10 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
 
     const res = await updateBookImage(book.id, file);
 
-    if (res) toast.success("Updated book image");
-    else toast.error("Updating book image failed");
+    if (res) {
+      toast.success("Updated book image");
+      router.refresh();
+    } else toast.error("Updating book image failed");
 
     setFile(null);
   }
@@ -72,6 +77,7 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
     if (res) toast.success("Book deleted successfully.");
     else toast.error("Something went wrong while deleting the book!");
 
+    router.push("/library");
     setIsMutating(false);
   }
 
