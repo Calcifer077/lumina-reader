@@ -6,6 +6,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 import { useGesture } from "@use-gesture/react";
+import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -96,10 +97,11 @@ export default function PdfViewer({
     setError("Failed to load PDF. Please try again.");
   }
 
+  // If the user clicks more than one time in 1 sec, previous clicks will be cancelled (debounce)
   useEffect(() => {
     if (lastSavedPage.current === pageNumber) return;
 
-    async function saveProgress() {
+    const timeout = setTimeout(async () => {
       try {
         setSaving(true);
         setSyncError("");
@@ -128,10 +130,11 @@ export default function PdfViewer({
       } finally {
         setSaving(false);
       }
-    }
+    }, 1000); // Wait 1 second after the last page change
 
-    saveProgress();
+    return () => clearTimeout(timeout);
   }, [pageNumber, bookId]);
+
   const goToPrevPage = () => setPageNumber((p) => Math.max(1, p - 1));
   const goToNextPage = () =>
     setPageNumber((p) => Math.min(numPages || p, p + 1));
@@ -141,6 +144,9 @@ export default function PdfViewer({
   const zoomOut = () =>
     setScale((s) => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
   const resetZoom = () => setScale(1);
+
+  useKeyPress("ArrowLeft", goToPrevPage, true);
+  useKeyPress("ArrowRight", goToNextPage, true);
 
   return (
     <div className="flex flex-col items-center gap-4">
