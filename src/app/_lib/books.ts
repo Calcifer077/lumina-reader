@@ -190,6 +190,26 @@ export async function updateBook(
  */
 export async function deleteBook(id: string): Promise<boolean> {
   try {
+    const [data] = await db.select().from(books).where(eq(books.id, id));
+
+    const { data: files, error: storageFetchingError } = await supabase.storage
+      .from("books")
+      .list(data.id_from_storage);
+
+    if (storageFetchingError) return false;
+
+    if (files && files.length > 0) {
+      const filesPath = files.map(
+        (file) => `${data.id_from_storage}/${file.name}`,
+      );
+
+      const { error: storageDeletingError } = await supabase.storage
+        .from("books")
+        .remove(filesPath);
+
+      if (storageDeletingError) return false;
+    }
+
     await db.delete(books).where(eq(books.id, id));
     return true;
   } catch (err) {
