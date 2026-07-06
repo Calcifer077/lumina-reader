@@ -179,8 +179,6 @@ export async function updateBook(
   }
 }
 
-// remaining tasks
-// have to delete book and cover url also from storage on deleting of book
 /**
  * Deletes books from database
  *
@@ -192,16 +190,19 @@ export async function deleteBook(id: string): Promise<boolean> {
   try {
     const [data] = await db.select().from(books).where(eq(books.id, id));
 
+    const idFromStorage = data.id_from_storage;
+
+    // First get all the files that are associated with this id.
     const { data: files, error: storageFetchingError } = await supabase.storage
       .from("books")
-      .list(data.id_from_storage);
+      .list(idFromStorage);
 
     if (storageFetchingError) return false;
 
+    // If there are files, than delete them.
     if (files && files.length > 0) {
-      const filesPath = files.map(
-        (file) => `${data.id_from_storage}/${file.name}`,
-      );
+      // We can just pass a array of path of files that are to be deleted.
+      const filesPath = files.map((file) => `${idFromStorage}/${file.name}`);
 
       const { error: storageDeletingError } = await supabase.storage
         .from("books")
@@ -211,6 +212,7 @@ export async function deleteBook(id: string): Promise<boolean> {
     }
 
     await db.delete(books).where(eq(books.id, id));
+
     return true;
   } catch (err) {
     console.error("Error while deleting book", err);
