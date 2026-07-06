@@ -148,7 +148,7 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
 
             <div className="flex flex-col mt-2">
               <div>
-                <Link href={`/reader/${1}`}>
+                <Link href={`/reader/${book.id}`}>
                   <Button className="mt-4 rounded-md h-14 md:h-10 w-full">
                     Continue Reading
                   </Button>

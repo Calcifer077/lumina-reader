@@ -83,6 +83,23 @@ export async function getBook(id: string): Promise<BookFromApi> {
   return res;
 }
 
+export async function getSignedUrlForBook(id: string): Promise<string | null> {
+  const [data] = await db
+    .select({ filePath: books.file_path })
+    .from(books)
+    .where(eq(books.id, id));
+
+  const filePath = data.filePath;
+
+  const { data: dataFromStorage, error } = await supabase.storage
+    .from("books")
+    .createSignedUrl(filePath, 60 * 60);
+
+  if (error) return null;
+
+  return dataFromStorage?.signedUrl;
+}
+
 async function getBookStorageId(id: string): Promise<string | boolean> {
   const [data] = await db
     .select({ idFromStorage: books.id_from_storage })
@@ -162,6 +179,8 @@ export async function updateBook(
   }
 }
 
+// remaining tasks
+// have to delete book and cover url also from storage on deleting of book
 /**
  * Deletes books from database
  *
