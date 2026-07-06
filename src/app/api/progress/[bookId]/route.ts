@@ -44,24 +44,22 @@ export async function POST(
   req: NextRequest,
   { params }: RouteParams,
 ): Promise<NextResponse<ApiResponse<ReadingProgress>>> {
-  const { bookId } = await params;
-
-  const body = await req.json();
-
-  console.log(body);
-
-  if (!isSaveProgressBody(body)) {
-    console.log("one");
-    return NextResponse.json(
-      { success: false, error: "Expected {location: string}" },
-      { status: 400 },
-    );
-  }
-
-  const res = await saveProgress(bookId, body.location);
-
-  return NextResponse.json({ success: true, data: res });
   try {
+    const { bookId } = await params;
+
+    const body = await req.json();
+
+    if (!isSaveProgressBody(body)) {
+      console.log("one");
+      return NextResponse.json(
+        { success: false, error: "Expected {location: string}" },
+        { status: 400 },
+      );
+    }
+
+    const res = await saveProgress(bookId, body.location);
+
+    return NextResponse.json({ success: true, data: res });
   } catch (err) {
     console.error("POST /api/progress/[bookId] failed:", err);
     return NextResponse.json(
