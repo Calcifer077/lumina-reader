@@ -26,3 +26,4 @@ export const readingProgress = pgTable("reading_progress", {
 
 export type Book = InferSelectModel<typeof books>;
 export type NewBook = InferInsertModel<typeof books>;
+export type ReadingProgress = InferSelectModel<typeof readingProgress>;

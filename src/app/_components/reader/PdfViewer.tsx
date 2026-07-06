@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -30,8 +30,9 @@ export default function PdfViewer({
   const [scale, setScale] = useState(1); // Actual PDF render scale
   const [visualScale, setVisualScale] = useState(1); // CSS tranform during pinch
   const [saving, setSaving] = useState(false);
+  const [syncError, setSyncError] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const lastSavedPage = useRef(null);
+  const lastSavedPage = useRef(initialPage);
 
   const viewerRef = useRef<HTMLDivElement>(null);
 
@@ -95,16 +96,42 @@ export default function PdfViewer({
     setError("Failed to load PDF. Please try again.");
   }
 
-  const saveProgress = useCallback((pageNumber: number) => {
-    console.log(pageNumber);
-  }, []);
-
   useEffect(() => {
-    if (numPages) {
-      saveProgress(pageNumber);
-    }
-  }, [pageNumber, numPages, saveProgress]);
+    if (lastSavedPage.current === pageNumber) return;
 
+    async function saveProgress() {
+      try {
+        setSaving(true);
+        setSyncError("");
+
+        const res = await fetch(`/api/progress/${bookId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            location: pageNumber.toString(),
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          setSyncError("There was a problem while syncing.");
+          return;
+        }
+
+        lastSavedPage.current = pageNumber;
+      } catch (err) {
+        console.error(err);
+        setSyncError("There was a problem while syncing.");
+      } finally {
+        setSaving(false);
+      }
+    }
+
+    saveProgress();
+  }, [pageNumber, bookId]);
   const goToPrevPage = () => setPageNumber((p) => Math.max(1, p - 1));
   const goToNextPage = () =>
     setPageNumber((p) => Math.min(numPages || p, p + 1));
@@ -118,7 +145,7 @@ export default function PdfViewer({
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Toolbar */}
-      <div className="flex items-center gap-4 sticky top-0 z-999 py-2 px-4 border-b border-border bg-surface/95 backdrop-blur-sm w-full justify-center rounded-b-lg touch-none">
+      <div className="flex flex-col md:flex-row items-center gap-4 md:sticky top-0 z-999 py-2 px-4 border-b border-border bg-surface/95 backdrop-blur-sm w-full justify-center rounded-b-lg touch-none">
         <div className="flex items-center gap-2">
           <button
             onClick={goToPrevPage}
@@ -180,8 +207,14 @@ export default function PdfViewer({
         </div>
 
         {saving && (
-          <span className="text-label-sm text-on-surface-variant/70 font-label animate-pulse">
+          <span className="absolute right-2 text-label-sm text-on-surface-variant/70 font-label animate-pulse">
             Saving progress…
+          </span>
+        )}
+
+        {syncError && (
+          <span className="text-label-sm text-red-900 font-label animate-pulse">
+            {syncError}
           </span>
         )}
       </div>
