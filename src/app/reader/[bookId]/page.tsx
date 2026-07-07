@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 
 import PdfViewer from "@/app/_components/reader/PdfViewer";
+import EpubViewer from "@/app/_components/reader/EpubViewer";
 
 import { getProgress } from "@/app/_lib/progress";
 import { getFormatAndSignedUrl } from "@/app/_lib/books";
@@ -26,14 +27,21 @@ export default async function ReaderPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      <div>
-        <PdfViewer
-          bookUrl={signedUrl}
-          bookId={bookId}
-          // If the user never read it, we will start from the first page
-          initialPage={progress ? Number(progress.location) : 1}
-        />
-      </div>
+      {format === "pdf" && (
+        <div>
+          <PdfViewer
+            bookUrl={signedUrl}
+            bookId={bookId}
+            // If the user never read it, we will start from the first page
+            initialPage={progress ? Number(progress.location) : 1}
+          />
+        </div>
+      )}
+      {format === "epub" && (
+        <div>
+          <EpubViewer url={signedUrl} />
+        </div>
+      )}
     </div>
   );
 }
