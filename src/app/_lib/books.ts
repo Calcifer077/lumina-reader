@@ -246,7 +246,7 @@ export async function getPdfPageCount(buffer: Buffer): Promise<number | null> {
  * As there is no fixed size of epub, this will be a approximate figure.
  */
 export async function getEpubPageCount(buffer: Buffer): Promise<number | null> {
-  const tmpPath = path.join(tmpdir(), `${randomUUID}.epub`);
+  const tmpPath = path.join(tmpdir(), `${randomUUID()}.epub`);
   await writeFile(tmpPath, buffer);
 
   try {
