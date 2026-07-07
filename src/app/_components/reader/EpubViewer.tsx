@@ -11,19 +11,23 @@ interface EpubViewerProps {
   location: string | null;
 }
 
+const MIN_SCALE = 50;
+const MAX_SCALE = 200;
+const SCALE_STEP = 5;
+
 export default function EpubViewer({ bookId, url, location }: EpubViewerProps) {
   const viewerRef = useRef<HTMLDivElement>(null);
 
   const bookRef = useRef<Book | null>(null);
   const renditionRef = useRef<Rendition | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedLocationRef = useRef<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [syncError, setSyncError] = useState("");
   const [saving, setSaving] = useState<boolean>(false);
-
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastSavedLocationRef = useRef<string | null>(null);
+  const [zoom, setZoom] = useState<number>(100);
 
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -154,9 +158,29 @@ export default function EpubViewer({ bookId, url, location }: EpubViewerProps) {
     };
   }, [url, location, bookId]);
 
+  function handleZoomLevel() {
+    const rendition = renditionRef.current;
+
+    if (!rendition) return;
+
+    rendition.themes.fontSize(zoom + "%");
+  }
+
   const goToPrevPage = () => renditionRef.current?.prev();
 
   const goToNextPage = () => renditionRef.current?.next();
+
+  const handleZoomNeg = () => {
+    setZoom((z) => Math.max(MIN_SCALE, z - SCALE_STEP));
+
+    handleZoomLevel();
+  };
+
+  const handleZoomPos = () => {
+    setZoom((z) => Math.min(MAX_SCALE, z + SCALE_STEP));
+
+    handleZoomLevel();
+  };
 
   useKeyPress("ArrowLeft", goToPrevPage, true);
   useKeyPress("ArrowRight", goToNextPage, true);
@@ -171,6 +195,9 @@ export default function EpubViewer({ bookId, url, location }: EpubViewerProps) {
         <button onClick={goToNextPage} className="rounded border px-3 py-1">
           Next
         </button>
+
+        <button onClick={handleZoomNeg}>- Zoom In</button>
+        <button onClick={handleZoomPos}>+ Zoom out</button>
 
         {loading && <span>Loading...</span>}
 
