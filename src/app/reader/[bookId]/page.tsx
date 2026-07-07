@@ -39,7 +39,11 @@ export default async function ReaderPage({ params }: Props) {
       )}
       {format === "epub" && (
         <div>
-          <EpubViewer url={signedUrl} />
+          <EpubViewer
+            bookId={bookId}
+            url={signedUrl}
+            location={progress ? progress.location : null}
+          />
         </div>
       )}
     </div>

@@ -6,10 +6,12 @@ import type { Book, Rendition, Location, Contents } from "epubjs";
 import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
 
 interface EpubViewerProps {
+  bookId: string;
   url: string;
+  location: string | null;
 }
 
-export default function EpubViewer({ url }: EpubViewerProps) {
+export default function EpubViewer({ bookId, url, location }: EpubViewerProps) {
   const viewerRef = useRef<HTMLDivElement>(null);
 
   const bookRef = useRef<Book | null>(null);
@@ -17,6 +19,11 @@ export default function EpubViewer({ url }: EpubViewerProps) {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [syncError, setSyncError] = useState("");
+  const [saving, setSaving] = useState<boolean>(false);
+
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedLocationRef = useRef<string | null>(null);
 
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -29,7 +36,6 @@ export default function EpubViewer({ url }: EpubViewerProps) {
         setLoading(true);
         setError("");
 
-        // Download the epub
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -40,7 +46,6 @@ export default function EpubViewer({ url }: EpubViewerProps) {
 
         if (cancelled) return;
 
-        // Open from binary data
         const book = ePub(buffer);
         const rendition = book.renderTo(viewer!, {
           width: "100%",
@@ -60,11 +65,63 @@ export default function EpubViewer({ url }: EpubViewerProps) {
         bookRef.current = book;
         renditionRef.current = rendition;
 
+        const saveProgress = async (locationStr: string) => {
+          if (locationStr === lastSavedLocationRef.current) {
+            return;
+          }
+
+          setSaving(true);
+
+          try {
+            const res = await fetch(`/api/progress/${bookId}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ location: locationStr }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+              setSyncError("There was a problem while syncing.");
+              return;
+            }
+
+            lastSavedLocationRef.current = locationStr;
+          } catch (err) {
+            console.error(err);
+            setSyncError("There was a problem while syncing.");
+          } finally {
+            setSaving(false);
+          }
+        };
+
         rendition.on("relocated", (location: Location) => {
-          console.log("Current CFI:", location.start.cfi);
+          const locationStr = location.start.cfi;
+
+          // Skip scheduling entirely if it matches the last saved location
+          if (locationStr === lastSavedLocationRef.current) {
+            return;
+          }
+
+          if (saveTimeoutRef.current) {
+            clearTimeout(saveTimeoutRef.current);
+          }
+
+          saveTimeoutRef.current = setTimeout(() => {
+            saveTimeoutRef.current = null;
+            if (!cancelled) {
+              saveProgress(locationStr);
+            }
+          }, 2000); // adjust debounce delay as needed
         });
 
-        await rendition.display();
+        if (location) {
+          await rendition.display(location);
+        } else {
+          await rendition.display();
+        }
 
         if (!cancelled) {
           setLoading(false);
@@ -84,13 +141,18 @@ export default function EpubViewer({ url }: EpubViewerProps) {
     return () => {
       cancelled = true;
 
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+
       renditionRef.current?.destroy();
       bookRef.current?.destroy();
 
       renditionRef.current = null;
       bookRef.current = null;
     };
-  }, [url]);
+  }, [url, location, bookId]);
 
   const goToPrevPage = () => renditionRef.current?.prev();
 
@@ -113,6 +175,9 @@ export default function EpubViewer({ url }: EpubViewerProps) {
         {loading && <span>Loading...</span>}
 
         {error && <span className="text-red-500">{error}</span>}
+
+        {saving && <span>Syncing...</span>}
+        {syncError && <span>{syncError}</span>}
       </div>
 
       <div ref={viewerRef} className="flex-1 overflow-hidden" />
