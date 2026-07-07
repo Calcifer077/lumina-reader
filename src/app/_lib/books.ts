@@ -83,11 +83,15 @@ export async function getBook(id: string): Promise<BookFromApi> {
   return res;
 }
 
-export async function getSignedUrlForBook(id: string): Promise<string | null> {
+export async function getFormatAndSignedUrl(
+  id: string,
+): Promise<{ signedUrl: string | null; format: string | null } | null> {
   const [data] = await db
-    .select({ filePath: books.file_path })
+    .select({ filePath: books.file_path, format: books.format })
     .from(books)
     .where(eq(books.id, id));
+
+  if (!data) return null;
 
   const filePath = data.filePath;
 
@@ -97,7 +101,10 @@ export async function getSignedUrlForBook(id: string): Promise<string | null> {
 
   if (error) return null;
 
-  return dataFromStorage?.signedUrl;
+  return {
+    signedUrl: dataFromStorage.signedUrl,
+    format: data.format,
+  };
 }
 
 async function getBookStorageId(id: string): Promise<string | boolean> {
