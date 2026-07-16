@@ -62,8 +62,8 @@ export default function PdfViewer({
   const [searchText, setSearchText] = useState<string>("");
   const [pageWidth, setPageWidth] = useState<number>(800);
   const [direction, setDirection] = useState(0);
-
-  const [scale, setScale] = useState<number | null>(null); // actual current render scale
+  const [useIFrame, setUseIFrame] = useState(false);
+  const [IFrameUsageConfirmation, setIFrameUsageConfirmation] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -79,6 +79,27 @@ export default function PdfViewer({
     window.addEventListener("resize", updateWidth);
     return () => window.removeEventListener("resize", updateWidth);
   }, []);
+
+  useEffect(() => {
+    if (!IFrameUsageConfirmation) return;
+
+    const timeout = setTimeout(() => setIFrameUsageConfirmation(false), 3000);
+    return () => clearTimeout(timeout);
+  }, [IFrameUsageConfirmation]);
+
+  function handleIFrameButtonClick() {
+    if (!IFrameUsageConfirmation) {
+      setIFrameUsageConfirmation(true);
+
+      toast.warning("This will remove feature of syncing.", {
+        position: "bottom-left",
+      });
+      return;
+    }
+
+    setUseIFrame((prev) => !prev);
+    setIFrameUsageConfirmation(false);
+  }
 
   function onBookLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
@@ -176,125 +197,139 @@ export default function PdfViewer({
   useKeyPress("ArrowLeft", goToPrevPage, true);
   useKeyPress("ArrowRight", goToNextPage, true);
 
-  return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background relative">
-      {/* 1. Added relative and overflow-hidden here to contain sliding pages */}
-      {/* Replace the middle section inside PdfViewer */}
-      <div className="flex-1 overflow-hidden relative bg-muted p-4 flex items-center justify-center w-full">
-        <Document
-          file={bookUrl}
-          onLoadSuccess={onBookLoadSuccess}
-          onLoadError={onBookLoadError}
-          loading={
-            <p className="text-body-md text-on-surface-variant font-body py-8 m-auto">
-              Loading PDF…
-            </p>
-          }
-          className="relative flex items-center justify-center w-full h-full overflow-hidden"
-        >
-          <div
-            className="absolute inset-0 z-0 pointer-events-auto cursor-pointer overflow-hidden flex items-center justify-center"
-            onClick={handleOverlayClick}
+  if (!useIFrame) {
+    return (
+      <div className="flex h-dvh flex-col overflow-hidden bg-background relative">
+        {/* 1. Added relative and overflow-hidden here to contain sliding pages */}
+        {/* Replace the middle section inside PdfViewer */}
+        <div className="flex-1 overflow-hidden relative bg-muted p-4 flex items-center justify-center w-full">
+          <Document
+            file={bookUrl}
+            onLoadSuccess={onBookLoadSuccess}
+            onLoadError={onBookLoadError}
+            loading={
+              <p className="text-body-md text-on-surface-variant font-body py-8 m-auto">
+                Loading PDF…
+              </p>
+            }
+            className="relative flex items-center justify-center w-full h-full overflow-hidden"
           >
-            <AnimatePresence initial={false} custom={direction}>
-              <motion.div
-                key={pageNumber}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ opacity: { duration: 0.1 } }}
-                className="absolute max-w-full max-h-full overflow-auto shadow-xl"
-              >
-                <Page
-                  pageNumber={pageNumber}
-                  customTextRenderer={textRenderer}
-                  width={pageWidth}
-                  scale={zoomLevel}
-                />
-              </motion.div>
-            </AnimatePresence>
+            <div
+              className="absolute inset-0 z-0 pointer-events-auto cursor-pointer overflow-hidden flex items-center justify-center"
+              onClick={handleOverlayClick}
+            >
+              <AnimatePresence initial={false} custom={direction}>
+                <motion.div
+                  key={pageNumber}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ opacity: { duration: 0.1 } }}
+                  className="absolute max-w-full max-h-full overflow-auto shadow-xl"
+                >
+                  <Page
+                    pageNumber={pageNumber}
+                    customTextRenderer={textRenderer}
+                    width={pageWidth}
+                    scale={zoomLevel}
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </Document>
+        </div>
+        {/* 3. Added relative and solid bg-background to ensure the control panel always sits over the rendering area */}
+        <div className="relative z-10 flex items-center justify-center gap-4 border-t bg-background p-4 shadow-sm">
+          <div className="hidden lg:flex items-center gap-2">
+            <label htmlFor="search" className="text-sm font-medium">
+              Search:
+            </label>
+            <input
+              type="search"
+              id="search"
+              value={searchText}
+              onChange={onChange}
+              className="border rounded px-2 py-1 text-sm bg-input"
+            />
           </div>
-        </Document>
-      </div>
-      {/* 3. Added relative and solid bg-background to ensure the control panel always sits over the rendering area */}
-      <div className="relative z-10 flex items-center justify-center gap-4 border-t bg-background p-4 shadow-sm">
-        <div className="hidden lg:flex items-center gap-2">
-          <label htmlFor="search" className="text-sm font-medium">
-            Search:
-          </label>
-          <input
-            type="search"
-            id="search"
-            value={searchText}
-            onChange={onChange}
-            className="border rounded px-2 py-1 text-sm bg-input"
-          />
+
+          <Button onClick={goToPrevPage} disabled={pageNumber === 1}>
+            Previous
+          </Button>
+
+          <span className="text-sm font-medium tabular-nums">
+            {pageNumber} {numPages && `/ ${numPages}`}
+          </span>
+
+          <Button
+            onClick={goToNextPage}
+            disabled={numPages ? pageNumber === numPages : false}
+          >
+            Next
+          </Button>
+
+          <Button onClick={zoomNeg}>-</Button>
+          <span className="text-sm font-medium min-w-14 text-center">
+            {Math.round(zoomLevel * 100)}%
+          </span>
+          <Button onClick={zoomPos}>+</Button>
         </div>
 
-        <Button onClick={goToPrevPage} disabled={pageNumber === 1}>
-          Previous
-        </Button>
-
-        <span className="text-sm font-medium tabular-nums">
-          {pageNumber} {numPages && `/ ${numPages}`}
-        </span>
-
-        <Button
-          onClick={goToNextPage}
-          disabled={numPages ? pageNumber === numPages : false}
-        >
-          Next
-        </Button>
-
-        <Button onClick={zoomNeg}>-</Button>
-        <span className="text-sm font-medium min-w-14 text-center">
-          {Math.round(zoomLevel * 100)}%
-        </span>
-        <Button onClick={zoomPos}>+</Button>
-      </div>
-
-      <div className="absolute top-4 right-4">
-        {/* <div>{isSaving && <CloudSync />}</div> */}
-        <div>
-          {error && (
-            <Tooltip>
-              <TooltipTrigger>
-                <CloudAlert
-                  onClick={() => {
-                    // Only run if the screen width is mobile
-                    if (window.innerWidth <= 768) {
-                      toast.error(error);
-                    }
-                  }}
-                />
-              </TooltipTrigger>
-              <TooltipContent>{error}</TooltipContent>
-            </Tooltip>
-          )}
+        <div className="absolute top-4 left-4">
+          <Button onClick={handleIFrameButtonClick}>
+            {IFrameUsageConfirmation ? "Click again to confirm" : "Use Iframe?"}
+          </Button>
         </div>
-        <div>
-          {!isSaving && (
-            <Tooltip>
-              <TooltipTrigger>
-                <CloudCheck />
-              </TooltipTrigger>
-              <TooltipContent>Everything is in sync</TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-        <div>
-          {isSaving && (
-            <Tooltip>
-              <TooltipTrigger>
-                <RefreshCw className="animate-spin" />
-              </TooltipTrigger>
-              <TooltipContent>Syncing with your library</TooltipContent>
-            </Tooltip>
-          )}
+
+        <div className="absolute top-4 right-4">
+          {/* <div>{isSaving && <CloudSync />}</div> */}
+          <div>
+            {error && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <CloudAlert
+                    onClick={() => {
+                      // Only run if the screen width is mobile
+                      if (window.innerWidth <= 768) {
+                        toast.error(error);
+                      }
+                    }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>{error}</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+          <div>
+            {!isSaving && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <CloudCheck />
+                </TooltipTrigger>
+                <TooltipContent>Everything is in sync</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+          <div>
+            {isSaving && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <RefreshCw className="animate-spin" />
+                </TooltipTrigger>
+                <TooltipContent>Syncing with your library</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div className="flex h-screen flex-col bg-background relative">
+        <iframe src={bookUrl} className="h-full w-full"></iframe>
+      </div>
+    );
+  }
 }
