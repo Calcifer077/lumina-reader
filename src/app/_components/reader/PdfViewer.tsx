@@ -1,18 +1,49 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type ChangeEvent,
+} from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+
+import { CloudAlert, CloudCheck, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from "motion/react";
+import { Button } from "@/components/ui/button";
 
 import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const MIN_SCALE_FACTOR = 0.5; // relative to "fit" scale
-const MAX_SCALE_FACTOR = 4; // relative to "fit" scale
-const SCALE_STEP = 0.25;
-const CONTAINER_PADDING = 32; // keep in sync with the p-4 (16px * 2 sides) on the viewer
+function highlightPattern(text: string, pattern: string) {
+  return text.replace(pattern, (value) => `<mark>${value}</mark>`);
+}
+
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    zIndex: 1,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? "100%" : "-100%",
+    opacity: 0,
+  }),
+};
 
 interface PdfViewerProps {
   bookUrl: string;
@@ -27,22 +58,29 @@ export default function PdfViewer({
 }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(initialPage);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [searchText, setSearchText] = useState<string>("");
+  const [pageWidth, setPageWidth] = useState<number>(800);
+  const [direction, setDirection] = useState(0);
 
-  const [fitScale, setFitScale] = useState<number | null>(null); // scale that fits the whole page in view
   const [scale, setScale] = useState<number | null>(null); // actual current render scale
 
-  const [saving, setSaving] = useState(false);
-  const [syncError, setSyncError] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const lastSavedPage = useRef(initialPage);
 
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const pageNaturalSize = useRef<{ width: number; height: number } | null>(
-    null,
-  );
-  const hasInitializedScale = useRef(false);
+  useEffect(() => {
+    const updateWidth = () => {
+      const width = Math.min(window.innerWidth - 32, 900);
+      setPageWidth(width);
+    };
 
-  function onBookLoadSuccess({ numPages }: { numPages: number }) {
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  function onBookLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
   }
 
@@ -51,57 +89,14 @@ export default function PdfViewer({
     setError("Failed to load PDF. Please try again.");
   }
 
-  // Compute the scale that fits the entire page inside the viewer
-  const computeFitScale = useCallback(() => {
-    const container = viewerRef.current;
-    const natural = pageNaturalSize.current;
-    if (!container || !natural) return;
-
-    const availableWidth = container.clientWidth - CONTAINER_PADDING;
-    const availableHeight = container.clientHeight - CONTAINER_PADDING;
-
-    const widthScale = availableWidth / natural.width;
-    const heightScale = availableHeight / natural.height;
-    const newFitScale = Math.min(widthScale, heightScale);
-
-    setFitScale(newFitScale);
-
-    // Only auto-set the render scale to "fit" the first time (initial load),
-    // so we don't stomp on a user's manual zoom when they resize/rotate mid-read.
-    if (!hasInitializedScale.current) {
-      setScale(newFitScale);
-      hasInitializedScale.current = true;
-    }
-  }, []);
-
-  // react-pdf's Page onLoadSuccess gives us the page's unscaled (original) size
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function onPageLoadSuccess(page: any) {
-    pageNaturalSize.current = {
-      width: page.originalWidth,
-      height: page.originalHeight,
-    };
-    computeFitScale();
-  }
-
-  // Recompute fit scale on container resize (rotation, split-screen, etc.)
-  useEffect(() => {
-    const container = viewerRef.current;
-    if (!container) return;
-
-    const observer = new ResizeObserver(() => computeFitScale());
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [computeFitScale]);
-
   // If the user clicks more than one time in 1 sec, previous clicks will be cancelled (debounce)
   useEffect(() => {
     if (lastSavedPage.current === pageNumber) return;
 
     const timeout = setTimeout(async () => {
       try {
-        setSaving(true);
-        setSyncError("");
+        setIsSaving(true);
+        setError("");
 
         const res = await fetch(`/api/progress/${bookId}`, {
           method: "POST",
@@ -116,141 +111,76 @@ export default function PdfViewer({
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-          setSyncError("There was a problem while syncing.");
+          setError("There was a problem while syncing.");
           return;
         }
 
         lastSavedPage.current = pageNumber;
       } catch (err) {
         console.error(err);
-        setSyncError("There was a problem while syncing.");
+        setError("There was a problem while syncing.");
       } finally {
-        setSaving(false);
+        setIsSaving(false);
       }
     }, 1000); // Wait 1 second after the last page change
 
     return () => clearTimeout(timeout);
   }, [pageNumber, bookId]);
 
-  const goToPrevPage = () => setPageNumber((p) => Math.max(1, p - 1));
-  const goToNextPage = () =>
-    setPageNumber((p) => Math.min(numPages || p, p + 1));
+  function goToPrevPage(): void {
+    if (pageNumber > 1) {
+      setDirection(-1);
+      setPageNumber((p) => p - 1);
+    }
+  }
 
-  const minScale = fitScale ? fitScale * MIN_SCALE_FACTOR : 0.25;
-  const maxScale = fitScale ? fitScale * MAX_SCALE_FACTOR : 3;
+  function goToNextPage(): void {
+    if (!numPages || pageNumber < numPages) {
+      setDirection(1);
+      setPageNumber((p) => p + 1);
+    }
+  }
 
-  const zoomIn = () =>
-    setScale((s) =>
-      Math.min(maxScale, +((s ?? minScale) + SCALE_STEP).toFixed(2)),
-    );
-  const zoomOut = () =>
-    setScale((s) =>
-      Math.max(minScale, +((s ?? maxScale) - SCALE_STEP).toFixed(2)),
-    );
-  const resetZoom = () => fitScale && setScale(fitScale);
+  function zoomPos(): void {
+    setZoomLevel((z) => Math.min(Number((z + 0.1).toFixed(2)), 3));
+  }
 
-  const isZoomedIn = !!fitScale && !!scale && scale > fitScale + 0.01;
+  function zoomNeg(): void {
+    setZoomLevel((z) => Math.max(Number((z - 0.1).toFixed(2)), 0.2));
+  }
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // When zoomed in, taps are used for panning (native scroll), not page nav
-    if (isZoomedIn) return;
+  function onChange(event: ChangeEvent<HTMLInputElement>) {
+    setSearchText(event.target.value);
+  }
+
+  const textRenderer = useCallback(
+    (textItem: { str: string }) => highlightPattern(textItem.str, searchText),
+    [searchText],
+  );
+
+  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
+    // If the user is zoomed in (zoomLevel > 1), disable click-to-page navigation
+    if (zoomLevel > 1) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const ratio = x / rect.width;
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
 
-    if (ratio < 0.3) {
-      goToPrevPage();
-    } else if (ratio > 0.7) {
-      goToNextPage();
+    if (clickX < width / 2) {
+      if (pageNumber > 1) goToPrevPage();
+    } else {
+      if (!numPages || pageNumber < numPages) goToNextPage();
     }
-  };
+  }
 
   useKeyPress("ArrowLeft", goToPrevPage, true);
   useKeyPress("ArrowRight", goToNextPage, true);
 
   return (
-    <div className="relative flex flex-col items-center gap-4 h-dvh w-full">
-      {/* Toolbar */}
-      <div className="flex flex-col md:flex-row items-center gap-4 md:sticky top-0 z-999 py-2 px-4 border-b border-border bg-surface/95 backdrop-blur-sm w-full justify-center rounded-b-lg touch-none">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={goToPrevPage}
-            disabled={pageNumber <= 1}
-            className="px-3 py-1.5 rounded-md border border-border bg-surface-low text-on-surface text-label-sm font-label
-                     hover:bg-surface-high transition-colors
-                     disabled:opacity-40 disabled:hover:bg-surface-low"
-          >
-            ← Prev
-          </button>
-
-          <span className="text-body-sm text-on-surface-variant font-body tabular-nums">
-            Page {pageNumber} of {numPages || "..."}
-          </span>
-
-          <button
-            onClick={goToNextPage}
-            disabled={pageNumber >= (numPages || 1)}
-            className="px-3 py-1.5 rounded-md border border-border bg-surface-low text-on-surface text-label-sm font-label
-                     hover:bg-surface-high transition-colors
-                     disabled:opacity-40 disabled:hover:bg-surface-low"
-          >
-            Next →
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 border-l border-border pl-4">
-          <button
-            onClick={zoomOut}
-            disabled={!scale || scale <= minScale}
-            className="w-7 h-7 flex items-center justify-center rounded-md border border-border bg-surface-low text-on-surface
-                     hover:bg-surface-high transition-colors
-                     disabled:opacity-40 disabled:hover:bg-surface-low"
-          >
-            −
-          </button>
-
-          <span className="text-body-sm text-on-surface-variant font-body w-12 text-center tabular-nums">
-            {fitScale && scale ? Math.round((scale / fitScale) * 100) : 100}%
-          </span>
-
-          <button
-            onClick={zoomIn}
-            disabled={!scale || scale >= maxScale}
-            className="w-7 h-7 flex items-center justify-center rounded-md border border-border bg-surface-low text-on-surface
-                     hover:bg-surface-high transition-colors
-                     disabled:opacity-40 disabled:hover:bg-surface-low"
-          >
-            +
-          </button>
-
-          <button
-            onClick={resetZoom}
-            className="px-2.5 py-1 rounded-md text-label-sm font-label text-primary
-                     hover:bg-primary-container/10 transition-colors"
-          >
-            Fit
-          </button>
-        </div>
-
-        {saving && (
-          <span className="absolute right-2 text-label-sm text-on-surface-variant/70 font-label animate-pulse">
-            Saving progress…
-          </span>
-        )}
-
-        {syncError && (
-          <span className="text-label-sm text-red-900 font-label animate-pulse">
-            {syncError}
-          </span>
-        )}
-      </div>
-
-      {/* PDF Page */}
-      <div
-        ref={viewerRef}
-        className="overflow-auto h-dvh w-full flex rounded-lg bg-surface-container-lowest shadow-sm border border-border p-4"
-      >
+    <div className="flex h-dvh flex-col overflow-hidden bg-background relative">
+      {/* 1. Added relative and overflow-hidden here to contain sliding pages */}
+      {/* Replace the middle section inside PdfViewer */}
+      <div className="flex-1 overflow-hidden relative bg-muted p-4 flex items-center justify-center w-full">
         <Document
           file={bookUrl}
           onLoadSuccess={onBookLoadSuccess}
@@ -260,28 +190,110 @@ export default function PdfViewer({
               Loading PDF…
             </p>
           }
-          className="m-auto"
+          className="relative flex items-center justify-center w-full h-full overflow-hidden"
         >
-          <div className="relative">
-            <Page
-              pageNumber={pageNumber}
-              scale={scale ?? 1}
-              onLoadSuccess={onPageLoadSuccess}
-              className="shadow-md"
-            />
-            <div
-              onClick={handleOverlayClick}
-              className="absolute inset-0"
-              style={{
-                zIndex: 10,
-                // Block browser gestures only when NOT zoomed (so tap-nav works cleanly).
-                // Once zoomed in, hand touch control back to the browser so drag-to-pan
-                // via the scrollable container works.
-                touchAction: isZoomedIn ? "pan-x pan-y" : "none",
-              }}
-            ></div>
+          <div
+            className="absolute inset-0 z-0 pointer-events-auto cursor-pointer overflow-hidden flex items-center justify-center"
+            onClick={handleOverlayClick}
+          >
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={pageNumber}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ opacity: { duration: 0.1 } }}
+                className="absolute max-w-full max-h-full overflow-auto shadow-xl"
+              >
+                <Page
+                  pageNumber={pageNumber}
+                  customTextRenderer={textRenderer}
+                  width={pageWidth}
+                  scale={zoomLevel}
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
         </Document>
+      </div>
+      {/* 3. Added relative and solid bg-background to ensure the control panel always sits over the rendering area */}
+      <div className="relative z-10 flex items-center justify-center gap-4 border-t bg-background p-4 shadow-sm">
+        <div className="hidden lg:flex items-center gap-2">
+          <label htmlFor="search" className="text-sm font-medium">
+            Search:
+          </label>
+          <input
+            type="search"
+            id="search"
+            value={searchText}
+            onChange={onChange}
+            className="border rounded px-2 py-1 text-sm bg-input"
+          />
+        </div>
+
+        <Button onClick={goToPrevPage} disabled={pageNumber === 1}>
+          Previous
+        </Button>
+
+        <span className="text-sm font-medium tabular-nums">
+          {pageNumber} {numPages && `/ ${numPages}`}
+        </span>
+
+        <Button
+          onClick={goToNextPage}
+          disabled={numPages ? pageNumber === numPages : false}
+        >
+          Next
+        </Button>
+
+        <Button onClick={zoomNeg}>-</Button>
+        <span className="text-sm font-medium min-w-14 text-center">
+          {Math.round(zoomLevel * 100)}%
+        </span>
+        <Button onClick={zoomPos}>+</Button>
+      </div>
+
+      <div className="absolute top-4 right-4">
+        {/* <div>{isSaving && <CloudSync />}</div> */}
+        <div>
+          {error && (
+            <Tooltip>
+              <TooltipTrigger>
+                <CloudAlert
+                  onClick={() => {
+                    // Only run if the screen width is mobile
+                    if (window.innerWidth <= 768) {
+                      toast.error(error);
+                    }
+                  }}
+                />
+              </TooltipTrigger>
+              <TooltipContent>{error}</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+        <div>
+          {!isSaving && (
+            <Tooltip>
+              <TooltipTrigger>
+                <CloudCheck />
+              </TooltipTrigger>
+              <TooltipContent>Everything is in sync</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+        <div>
+          {isSaving && (
+            <Tooltip>
+              <TooltipTrigger>
+                <RefreshCw className="animate-spin" />
+              </TooltipTrigger>
+              <TooltipContent>Syncing with your library</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </div>
     </div>
   );

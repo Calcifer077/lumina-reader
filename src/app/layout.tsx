@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Literata, Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
 
@@ -55,7 +56,9 @@ export default function RootLayout({
           antialiased
         `}
       >
-        <main>{children}</main>
+        <main>
+          <TooltipProvider>{children}</TooltipProvider>
+        </main>
         <Toaster
           richColors
           toastOptions={{

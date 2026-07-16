@@ -26,25 +26,21 @@ export default async function ReaderPage({ params }: Props) {
   if (signedUrl === null) notFound();
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className="w-full min-h-dvh overflow-hidden bg-background">
       {format === "pdf" && (
-        <div>
-          <PdfViewer
-            bookUrl={signedUrl}
-            bookId={bookId}
-            // If the user never read it, we will start from the first page
-            initialPage={progress ? Number(progress.location) : 1}
-          />
-        </div>
+        <PdfViewer
+          bookUrl={signedUrl}
+          bookId={bookId}
+          // If the user never read it, we will start from the first page
+          initialPage={progress ? Number(progress.location) : 1}
+        />
       )}
       {format === "epub" && (
-        <div>
-          <EpubViewer
-            bookId={bookId}
-            url={signedUrl}
-            location={progress ? progress.location : null}
-          />
-        </div>
+        <EpubViewer
+          bookId={bookId}
+          url={signedUrl}
+          location={progress ? progress.location : null}
+        />
       )}
     </div>
   );
