@@ -12,7 +12,14 @@ export default async function GridView({
 }) {
   const books = await booksPromise;
 
-  const sortedBooks = [...books].sort((a, b) => {
+  const filteredBooks =
+    sort === "pdf"
+      ? books.filter((b) => b.format === "pdf")
+      : sort === "epub"
+        ? books.filter((b) => b.format === "epub")
+        : books;
+
+  const sortedBooks = [...filteredBooks].sort((a, b) => {
     switch (sort) {
       case "recently_added":
         return (
