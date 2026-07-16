@@ -13,6 +13,8 @@ const selectOptions = [
   { text: "recently opened", value: "recently_opened" },
   { text: "Title A-Z", value: "title_a-z" },
   { text: "Title Z-A", value: "title_z-a" },
+  { text: "PDFs", value: "pdf" },
+  { text: "EPUB", value: "epub" },
 ];
 
 export default function Toolbar() {
