@@ -1,50 +1,63 @@
+"use client";
+
 import { FaBookReader } from "react-icons/fa";
 import { HiOutlineDocumentDuplicate, HiOutlineBookOpen } from "react-icons/hi2";
-import { LuHistory, LuStar, LuArchive } from "react-icons/lu";
+import { LuHistory } from "react-icons/lu";
 import { MdOutlinePictureAsPdf, MdOutlineSettings } from "react-icons/md";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const menuItems = [
   {
     name: "All Books",
     icon: <HiOutlineDocumentDuplicate className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
+    value: "title_a-z",
   },
   {
     name: "Recent",
     icon: <LuHistory className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
-  },
-  {
-    name: "Favorites",
-    icon: <LuStar className="h-5 w-5" />,
-    visibleInMobileAndTablet: false,
+    value: "recently_opened",
   },
   {
     name: "PDF Documents",
     icon: <MdOutlinePictureAsPdf className="h-5 w-5" />,
     visibleInMobileAndTablet: false,
+    value: "pdf",
   },
   {
     name: "EPUB Files",
     icon: <HiOutlineBookOpen className="h-5 w-5" />,
     visibleInMobileAndTablet: false,
+    value: "epub",
   },
 ];
 
 const bottomLeftMenuItems = [
   {
-    name: "Archived",
-    icon: <LuArchive className="h-5 w-5" />,
-    visibleInMobileAndTablet: false,
-  },
-  {
     name: "Settings",
     icon: <MdOutlineSettings className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
+    value: "",
   },
 ];
 
 export default function Sidebar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [value, setValue] = useState("recently_added");
+
+  function changeValue(value: string) {
+    const params = new URLSearchParams(searchParams);
+    params.set("sort", value);
+
+    setValue(value);
+
+    router.push(`?${params.toString()}`);
+  }
+
   return (
     <aside
       className="
@@ -68,6 +81,7 @@ export default function Sidebar() {
             <button
               key={item.name}
               className="flex flex-col items-center gap-1 text-muted-foreground transition-colors hover:text-primary"
+              onClick={() => changeValue(item.value)}
             >
               {item.icon}
               <span className="text-[10px]">{item.name}</span>
@@ -89,6 +103,7 @@ export default function Sidebar() {
             <button
               key={item.name}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30"
+              onClick={() => changeValue(item.value)}
             >
               {item.icon}
               <span>{item.name}</span>
