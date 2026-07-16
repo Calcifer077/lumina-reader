@@ -1,21 +1,13 @@
-"use client";
-
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ReactReader, ReactReaderStyle } from "react-reader";
 import type { Rendition } from "epubjs";
 import { Menu, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-interface EpubViewerProps {
-  bookId: string;
-  url: string;
-  /** Initial location (epubcfi string) to open the book at, or null to start at the beginning */
-  location: string | null;
-}
-
-// Custom styles for the ReactReader chrome (arrows, container inset, etc.)
+// 1. Create a custom styles object
 const customReaderStyles = {
   ...ReactReaderStyle,
+  // Overriding next/prev buttons
   arrow: {
     ...ReactReaderStyle.arrow,
     color: "#8b4513",
@@ -29,109 +21,17 @@ const customReaderStyles = {
   },
 };
 
-const SAVE_DEBOUNCE_MS = 2000;
+export default function App() {
+  const [location, setLocation] = useState<string | number>(0);
 
-export default function EpubViewer({
-  bookId,
-  url,
-  location: initialLocation,
-}: EpubViewerProps) {
-  // --- Rendering / location state (from ReactReader-based viewer) ---
-  const [location, setLocation] = useState<string | number>(
-    initialLocation ?? 0,
-  );
   const [bgColor, setBgColor] = useState("FBF0D9");
   const [textColor, setTextColor] = useState("3D342D");
   const [fontSize, setFontSize] = useState("120");
+
   const [isVisible, setIsVisible] = useState(false);
 
   const renditionRef = useRef<Rendition | undefined>(undefined);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // --- Progress-sync state (from custom epubjs viewer) ---
-  const [saving, setSaving] = useState<boolean>(false);
-  const [syncError, setSyncError] = useState("");
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastSavedLocationRef = useRef<string | null>(null);
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-        saveTimeoutRef.current = null;
-      }
-    };
-  }, []);
-
-  const saveProgress = useCallback(
-    async (locationStr: string) => {
-      if (locationStr === lastSavedLocationRef.current) {
-        return;
-      }
-
-      setSaving(true);
-      setSyncError("");
-
-      try {
-        const res = await fetch(`/api/progress/${bookId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ location: locationStr }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          setSyncError("There was a problem while syncing.");
-          return;
-        }
-
-        lastSavedLocationRef.current = locationStr;
-      } catch (err) {
-        console.error(err);
-        setSyncError("There was a problem while syncing.");
-      } finally {
-        if (isMountedRef.current) {
-          setSaving(false);
-        }
-      }
-    },
-    [bookId],
-  );
-
-  // Debounce saves so we don't hit the API on every single page turn.
-  const scheduleSaveProgress = useCallback(
-    (locationStr: string) => {
-      if (locationStr === lastSavedLocationRef.current) {
-        return;
-      }
-
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-
-      saveTimeoutRef.current = setTimeout(() => {
-        saveTimeoutRef.current = null;
-        saveProgress(locationStr);
-      }, SAVE_DEBOUNCE_MS);
-    },
-    [saveProgress],
-  );
-
-  const handleLocationChanged = useCallback(
-    (epubcfi: string) => {
-      setLocation(epubcfi);
-      scheduleSaveProgress(epubcfi);
-    },
-    [scheduleSaveProgress],
-  );
-
-  // --- Appearance controls ---
   function handleBgColorChange(e: React.ChangeEvent<HTMLInputElement>) {
     setBgColor(e.target.value);
   }
@@ -153,7 +53,7 @@ export default function EpubViewer({
     rendition.themes.override("color", `#${textColor}`);
     rendition.themes.fontSize(`${Number(fontSize)}%`);
   }, [bgColor, textColor, fontSize]);
-
+  const containerRef = useRef<HTMLDivElement>(null);
   return (
     <div className="h-dvh">
       <div className="relative">
@@ -188,23 +88,16 @@ export default function EpubViewer({
               value={fontSize}
               onChange={handleFontSizeChange}
             />
-
-            {/* Sync status indicators */}
-            <div className="mt-1 text-xs text-slate-500">
-              {saving && <span>Syncing...</span>}
-              {syncError && <span className="text-red-600">{syncError}</span>}
-            </div>
           </div>
         )}
       </div>
       <div ref={containerRef} className="relative h-full w-full">
         <ReactReader
-          url={url}
+          url="https://react-reader.metabits.no/files/alice.epub"
           location={location}
-          locationChanged={handleLocationChanged}
+          locationChanged={(epubcfi: string) => setLocation(epubcfi)}
           readerStyles={customReaderStyles}
           epubOptions={{ spread: "none" }}
-          epubInitOptions={{ openAs: "epub" }}
           getRendition={(rendition) => {
             renditionRef.current = rendition;
 
@@ -264,11 +157,6 @@ export default function EpubViewer({
                 rendition.next();
               }
             });
-
-            // If an initial location/progress was passed in, jump there once mounted.
-            if (initialLocation) {
-              rendition.display(initialLocation);
-            }
           }}
         />
       </div>
