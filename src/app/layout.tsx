@@ -45,6 +45,22 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("font-sans", outfit.variable)} // Set Outfit as default font-sans base
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('darkMode');
+                  if (saved === 'true') {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`
           ${outfit.variable}
