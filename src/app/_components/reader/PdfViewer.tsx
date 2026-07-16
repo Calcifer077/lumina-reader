@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 
 import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
+import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -58,7 +59,7 @@ export default function PdfViewer({
 }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(initialPage);
-  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [zoomLevel, setZoomLevel] = useLocalStorage("pdf-zoom-level", 1);
   const [searchText, setSearchText] = useState<string>("");
   const [pageWidth, setPageWidth] = useState<number>(800);
   const [direction, setDirection] = useState(0);

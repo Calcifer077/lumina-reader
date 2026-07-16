@@ -6,6 +6,8 @@ import type { Rendition } from "epubjs";
 import { Menu, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
+
 interface EpubViewerProps {
   bookId: string;
   url: string;
@@ -40,9 +42,12 @@ export default function EpubViewer({
   const [location, setLocation] = useState<string | number>(
     initialLocation ?? 0,
   );
-  const [bgColor, setBgColor] = useState("FBF0D9");
-  const [textColor, setTextColor] = useState("3D342D");
-  const [fontSize, setFontSize] = useState("120");
+  const [bgColor, setBgColor] = useLocalStorage("epub-bg-color", "FBF0D9");
+  const [textColor, setTextColor] = useLocalStorage(
+    "epub-text-color",
+    "3D342D",
+  );
+  const [fontSize, setFontSize] = useLocalStorage("epub-font-size", "120");
   const [isVisible, setIsVisible] = useState(false);
 
   const renditionRef = useRef<Rendition | undefined>(undefined);
