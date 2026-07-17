@@ -41,7 +41,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Form */}
-          <div className="flex flex-col md:flex-row gap-4 w-full max-w-2xl justify-center items-center">
+          <div className="flex flex-col md:flex-row gap-4 w-full max-w-2xl justify-center items-center my-auto">
             <Input
               placeholder="Name"
               className="max-w-sm bg-surface text-on-surface-variant transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-primary"
