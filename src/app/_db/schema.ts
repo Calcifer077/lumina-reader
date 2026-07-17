@@ -24,6 +24,13 @@ export const readingProgress = pgTable("reading_progress", {
   updated_at: timestamp("updated_at").defaultNow(),
 });
 
+export const userDetails = pgTable("user_details", {
+  id: integer("id").default(1).primaryKey(),
+  email: text("email"),
+  name: text("name"),
+  profilePicturePath: text("profile_picture_path"),
+});
+
 export type Book = InferSelectModel<typeof books>;
 export type NewBook = InferInsertModel<typeof books>;
 export type ReadingProgress = InferSelectModel<typeof readingProgress>;
