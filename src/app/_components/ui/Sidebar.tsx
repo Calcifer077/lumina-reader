@@ -6,31 +6,29 @@ import { LuHistory } from "react-icons/lu";
 import { MdOutlinePictureAsPdf, MdOutlineSettings } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 const menuItems = [
   {
     name: "All Books",
     icon: <HiOutlineDocumentDuplicate className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
-    value: "title_a-z",
+    href: "/library",
   },
   {
     name: "Recent",
     icon: <LuHistory className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
-    value: "recently_opened",
   },
   {
     name: "PDF Documents",
     icon: <MdOutlinePictureAsPdf className="h-5 w-5" />,
     visibleInMobileAndTablet: false,
-    value: "pdf",
   },
   {
     name: "EPUB Files",
     icon: <HiOutlineBookOpen className="h-5 w-5" />,
     visibleInMobileAndTablet: false,
-    value: "epub",
   },
 ];
 
@@ -39,25 +37,11 @@ const bottomLeftMenuItems = [
     name: "Settings",
     icon: <MdOutlineSettings className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
-    value: "",
+    href: "settings",
   },
 ];
 
 export default function Sidebar() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [value, setValue] = useState("recently_added");
-
-  function changeValue(value: string) {
-    const params = new URLSearchParams(searchParams);
-    params.set("sort", value);
-
-    setValue(value);
-
-    router.push(`?${params.toString()}`);
-  }
-
   return (
     <aside
       className="
@@ -77,16 +61,27 @@ export default function Sidebar() {
       <div className="flex h-full items-center justify-around lg:hidden">
         {[...menuItems, ...bottomLeftMenuItems]
           .filter((item) => item.visibleInMobileAndTablet)
-          .map((item) => (
-            <button
-              key={item.name}
-              className="flex flex-col items-center gap-1 text-muted-foreground transition-colors hover:text-primary"
-              onClick={() => changeValue(item.value)}
-            >
-              {item.icon}
-              <span className="text-[10px]">{item.name}</span>
-            </button>
-          ))}
+          .map((item) => {
+            const className =
+              "flex flex-col items-center gap-1 text-muted-foreground transition-colors hover:text-primary";
+
+            const content = (
+              <>
+                {item.icon}
+                <span className="text-[10px]">{item.name}</span>
+              </>
+            );
+
+            return item.href ? (
+              <Link key={item.name} href={item.href} className={className}>
+                {content}
+              </Link>
+            ) : (
+              <button key={item.name} className={className}>
+                {content}
+              </button>
+            );
+          })}
       </div>
 
       {/* ================= Desktop ================= */}
@@ -99,28 +94,38 @@ export default function Sidebar() {
 
         {/* Main Menu */}
         <nav className="mt-8 space-y-1">
-          {menuItems.map((item) => (
-            <button
-              key={item.name}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30"
-              onClick={() => changeValue(item.value)}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </button>
-          ))}
+          {menuItems.map((item) => {
+            const className =
+              "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30";
+
+            const content = (
+              <>
+                {item.icon}
+                <span className="text-[10px]">{item.name}</span>
+              </>
+            );
+
+            return item.href ? (
+              <Link key={item.name} href={item.href} className={className}>
+                {content}
+              </Link>
+            ) : (
+              <button key={item.name} className={className}>
+                {content}
+              </button>
+            );
+          })}
         </nav>
 
         {/* Bottom Menu */}
         <nav className="mt-auto space-y-1 border-t border-border pt-4">
           {bottomLeftMenuItems.map((item) => (
-            <button
-              key={item.name}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30"
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </button>
+            <Link href={item.href} key={item.name}>
+              <button className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30">
+                {item.icon}
+                <span>{item.name}</span>
+              </button>
+            </Link>
           ))}
         </nav>
       </div>
