@@ -1,6 +1,6 @@
 import SettingsPageView from "@/app/_components/settings/SettingPageView";
 import {
-  getProfilePicturePath,
+  getProfilePictureSignedUrl,
   getUserEmail,
   getUserName,
 } from "@/app/_lib/userDetails";
@@ -9,7 +9,7 @@ export default async function SettingsPage() {
   const [userName, email, profilePicturePath] = await Promise.all([
     getUserName(),
     getUserEmail(),
-    getProfilePicturePath(),
+    getProfilePictureSignedUrl(),
   ]);
 
   return (
