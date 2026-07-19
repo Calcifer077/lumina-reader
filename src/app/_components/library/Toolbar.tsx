@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import CustomSelect from "@/app/_components/ui/custom-select";
@@ -21,14 +20,12 @@ export default function Toolbar() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [value, setValue] = useState("recently_added");
-  const [view, setView] = useState(searchParams.get("view") || "grid");
+  const view = searchParams.get("view") || "grid";
+  const value = searchParams.get("sort") || "recently_added";
 
   function changeView(view: "grid" | "list") {
     const params = new URLSearchParams(searchParams);
     params.set("view", view);
-
-    setView(view);
 
     router.push(`?${params.toString()}`);
   }
@@ -36,8 +33,6 @@ export default function Toolbar() {
   function changeValue(value: string) {
     const params = new URLSearchParams(searchParams);
     params.set("sort", value);
-
-    setValue(value);
 
     router.push(`?${params.toString()}`);
   }

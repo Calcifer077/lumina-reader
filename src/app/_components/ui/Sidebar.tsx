@@ -14,21 +14,25 @@ const menuItems = [
     icon: <HiOutlineDocumentDuplicate className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
     href: "/library",
+    value: "",
   },
   {
     name: "Recent",
     icon: <LuHistory className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
+    value: "recently_opened",
   },
   {
     name: "PDF Documents",
     icon: <MdOutlinePictureAsPdf className="h-5 w-5" />,
     visibleInMobileAndTablet: false,
+    value: "pdf",
   },
   {
     name: "EPUB Files",
     icon: <HiOutlineBookOpen className="h-5 w-5" />,
     visibleInMobileAndTablet: false,
+    value: "epub",
   },
 ];
 
@@ -38,10 +42,25 @@ const bottomLeftMenuItems = [
     icon: <MdOutlineSettings className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
     href: "settings",
+    value: "",
   },
 ];
 
 export default function Sidebar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [value, setValue] = useState("recently_added");
+
+  function changeValue(value: string) {
+    const params = new URLSearchParams(searchParams);
+    params.set("sort", value);
+
+    setValue(value);
+
+    router.push(`?${params.toString()}`);
+  }
+
   return (
     <aside
       className="
@@ -77,7 +96,11 @@ export default function Sidebar() {
                 {content}
               </Link>
             ) : (
-              <button key={item.name} className={className}>
+              <button
+                key={item.name}
+                className={className}
+                onClick={() => changeValue(item.value)}
+              >
                 {content}
               </button>
             );
@@ -110,7 +133,11 @@ export default function Sidebar() {
                 {content}
               </Link>
             ) : (
-              <button key={item.name} className={className}>
+              <button
+                key={item.name}
+                className={className}
+                onClick={() => changeValue(item.value)}
+              >
                 {content}
               </button>
             );
