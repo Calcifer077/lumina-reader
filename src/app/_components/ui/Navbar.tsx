@@ -14,7 +14,11 @@ import UploadDocumentsModal from "@/app/_components/ui/UploadDocumentsModal";
 
 import { Button } from "@/components/ui/button";
 
-export default function Navbar() {
+interface NavbarProps {
+  profilePicturePath: string;
+}
+
+export default function Navbar({ profilePicturePath }: NavbarProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const { darkMode, toggle } = useTheme();
 
@@ -70,7 +74,12 @@ export default function Navbar() {
           </Button>
 
           <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
-            <Image src="/115633814.jpg" alt="Profile" width={40} height={40} />
+            <Image
+              src={profilePicturePath}
+              alt="Profile"
+              width={40}
+              height={40}
+            />
           </div>
         </div>
       </nav>
