@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
 import Image from "next/image";
 import UploadProfilePictureModal from "@/app/_components/settings/UploadProfilePictureModal";
+import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
 
 interface SettingPageViewProps {
   userName: string;
@@ -19,10 +20,16 @@ export default function SettingsPageView({
   email,
   profilePicturePath,
 }: SettingPageViewProps) {
-  const [backgroundColor, setBackgroundColor] = useState("#f7f9f9");
-  const [textColor, setTextColor] = useState("#222222");
-  const [fontSize, setFontSize] = useState(120);
-  const [zoom, setZoom] = useState(95);
+  const [backgroundColor, setBackgroundColor] = useLocalStorage(
+    "epub-bg-color",
+    "#f7f9f9",
+  );
+  const [textColor, setTextColor] = useLocalStorage(
+    "epub-text-color",
+    "#222222",
+  );
+  const [fontSize, setFontSize] = useLocalStorage("epub-font-size", 120);
+  const [zoom, setZoom] = useLocalStorage("pdf-zoom-level", 1);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -93,7 +100,7 @@ export default function SettingsPageView({
               <h3 className="font-semibold text-lg">Zoom Level</h3>
 
               <span className="rounded-full bg-secondary-container px-3 py-1 text-sm font-medium text-on-secondary-container tabular-nums">
-                {zoom}%
+                {(zoom * 100).toFixed(0)}%
               </span>
             </div>
 
@@ -110,8 +117,9 @@ export default function SettingsPageView({
               <Slider
                 value={[zoom]}
                 onValueChange={([v]) => setZoom(v)}
-                max={100}
-                step={1}
+                max={3}
+                min={0.2}
+                step={0.1}
                 className="flex-1 [&_[role=slider]]:transition-transform [&_[role=slider]]:duration-150 [&_[role=slider]]:active:scale-110"
               />
 
