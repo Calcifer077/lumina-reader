@@ -1,13 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { BookOpen, Minus, Pencil, Plus, TriangleAlert } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
+
+import { BookOpen, Minus, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Image from "next/image";
+
 import UploadProfilePictureModal from "@/app/_components/settings/UploadProfilePictureModal";
 import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 
 interface SettingPageViewProps {
   userName: string;

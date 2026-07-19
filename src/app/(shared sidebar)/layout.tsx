@@ -1,6 +1,5 @@
 import Navbar from "@/app/_components/ui/Navbar";
 import Sidebar from "@/app/_components/ui/Sidebar";
-
 import { getProfilePictureSignedUrl } from "@/app/_lib/userDetails";
 
 export default async function layout({

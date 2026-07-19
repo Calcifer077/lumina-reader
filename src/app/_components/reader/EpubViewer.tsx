@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ReactReader, ReactReaderStyle } from "react-reader";
+
 import type { Rendition } from "epubjs";
 import { Menu, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
 
 import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
+import { Input } from "@/components/ui/input";
 
 interface EpubViewerProps {
   bookId: string;

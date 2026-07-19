@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 
 export interface CustomSelectOption {

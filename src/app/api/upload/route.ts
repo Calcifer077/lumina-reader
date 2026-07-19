@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { supabase } from "@/app/_lib/supabase";
-import { db } from "@/app/_lib/db";
+import { NextRequest, NextResponse } from "next/server";
+
 import { books } from "@/app/_db/schema";
-import { getPdfPageCount, getEpubPageCount } from "@/app/_lib/books";
-import type { ApiResponse } from "@/app/_lib/types";
 import type { Book } from "@/app/_db/schema";
+import { getEpubPageCount, getPdfPageCount } from "@/app/_lib/books";
+import { db } from "@/app/_lib/db";
+import { supabase } from "@/app/_lib/supabase";
+import type { ApiResponse } from "@/app/_lib/types";
 import { getExtension } from "@/app/_lib/utils";
 
 export const runtime = "nodejs";

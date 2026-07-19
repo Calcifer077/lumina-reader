@@ -1,11 +1,12 @@
 "use server";
 
-import { db } from "@/app/_lib/db";
+import { randomUUID } from "crypto";
+import { eq } from "drizzle-orm";
 
 import { userDetails } from "@/app/_db/schema";
-import { randomUUID } from "crypto";
+import { db } from "@/app/_lib/db";
+
 import { supabase } from "./supabase";
-import { eq } from "drizzle-orm";
 
 const PLACEHOLDER_USER_IMAGE = "/placeholder-user-image.png";
 

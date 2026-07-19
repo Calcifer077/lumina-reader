@@ -1,15 +1,16 @@
 "use client";
 
 import { JSX, useRef, useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { X, UploadCloud, FileText, CheckCircle2, XCircle } from "lucide-react";
 
-import { useOnClickOutside } from "@/app/_lib/hooks/useOnClickOutisde";
+import { CheckCircle2, FileText, UploadCloud, X, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
+import { useOnClickOutside } from "@/app/_lib/hooks/useOnClickOutisde";
 import type { ApiResponse } from "@/app/_lib/types";
 import type { Book } from "@/app/_lib/types";
-import { getExtension, formatSize, stripExtension } from "@/app/_lib/utils";
+import { formatSize, getExtension, stripExtension } from "@/app/_lib/utils";
 
 type FileStatus = "waiting" | "uploading" | "complete" | "error";
 

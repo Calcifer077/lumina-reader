@@ -1,16 +1,13 @@
 import { Suspense } from "react";
 
-import { getBooks, getTotalBooks } from "@/app/_lib/books";
-
+import EmptyLibrary from "@/app/_components/library/EmptyLibrary";
 import GridView from "@/app/_components/library/GridView";
 import GridViewSkeleton from "@/app/_components/library/GridViewSkeleton";
-
 import ListView from "@/app/_components/library/ListView";
 import ListViewSkeleton from "@/app/_components/library/ListViewSkeleton";
-
 import Toolbar from "@/app/_components/library/Toolbar";
 import ToolbarSkeleton from "@/app/_components/library/ToolbarSkeleton";
-import EmptyLibrary from "@/app/_components/library/EmptyLibrary";
+import { getBooks, getTotalBooks } from "@/app/_lib/books";
 
 // import type { BookFromApi } from "@/app/_lib/types";
 

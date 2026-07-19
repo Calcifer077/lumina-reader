@@ -1,19 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { CiSearch } from "react-icons/ci";
+import { IoMdCloudUpload } from "react-icons/io";
+
+import { Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "@/app/_lib/hooks/useTheme";
 
-import { IoMdCloudUpload } from "react-icons/io";
-import { CiSearch } from "react-icons/ci";
-
-import { Sun, Moon } from "lucide-react";
-
-import { Input } from "@/components/ui/input";
 import UploadDocumentsModal from "@/app/_components/ui/UploadDocumentsModal";
-
+import { useTheme } from "@/app/_lib/hooks/useTheme";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface NavbarProps {
   profilePicturePath: string;

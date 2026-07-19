@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { MoveLeft, Upload, Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import DangerAlertDialog from "@/app/_components/book/DangerAlertDialog";
+import { useRef, useState } from "react";
 
-import type { BookFromApi } from "@/app/_lib/types";
-import { updateBook, deleteBook, updateBookImage } from "@/app/_lib/books";
+import { MoveLeft, Pencil, Upload } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+
+import DangerAlertDialog from "@/app/_components/book/DangerAlertDialog";
+import { deleteBook, updateBook, updateBookImage } from "@/app/_lib/books";
+import type { BookFromApi } from "@/app/_lib/types";
+import { Button } from "@/components/ui/button";
 
 export default function BookPageView({ book }: { book: BookFromApi }) {
   const [title, setTitle] = useState<string>(book.title);

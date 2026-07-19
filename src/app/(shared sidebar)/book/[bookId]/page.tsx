@@ -1,9 +1,8 @@
 // app/book/[bookId]/page.tsx
-
 import { notFound } from "next/navigation";
 
-import { getBook } from "@/app/_lib/books";
 import BookPageView from "@/app/_components/book/BookPageView";
+import { getBook } from "@/app/_lib/books";
 
 type Props = {
   params: Promise<{ bookId: string }>;

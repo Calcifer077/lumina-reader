@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ReactReader, ReactReaderStyle } from "react-reader";
+
 import type { Rendition } from "epubjs";
 import { Menu, X } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 
 // 1. Create a custom styles object

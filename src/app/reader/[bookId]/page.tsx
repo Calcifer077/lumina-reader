@@ -1,11 +1,10 @@
 // _app/reader/[bookId]
 import { notFound } from "next/navigation";
 
-import PdfViewer from "@/app/_components/reader/PdfViewer";
 import EpubViewer from "@/app/_components/reader/EpubViewer";
-
-import { getProgress } from "@/app/_lib/progress";
+import PdfViewer from "@/app/_components/reader/PdfViewer";
 import { getFormatAndSignedUrl } from "@/app/_lib/books";
+import { getProgress } from "@/app/_lib/progress";
 
 // get params from url
 type Props = {

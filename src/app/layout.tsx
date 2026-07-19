@@ -1,12 +1,12 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Literata, Plus_Jakarta_Sans, Outfit } from "next/font/google";
+import { Literata, Outfit, Plus_Jakarta_Sans } from "next/font/google";
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 import "./globals.css";
-
-import { cn } from "@/lib/utils";
 
 // Outfit is the perfect lookalike for Google Sans / Product Sans
 const outfit = Outfit({

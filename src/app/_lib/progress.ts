@@ -1,10 +1,10 @@
 "use server";
 
-import { db } from "@/app/_lib/db";
+import { eq } from "drizzle-orm";
 
 import { readingProgress } from "@/app/_db/schema";
 import type { ReadingProgress } from "@/app/_db/schema";
-import { eq } from "drizzle-orm";
+import { db } from "@/app/_lib/db";
 
 export async function getProgress(bookId: string): Promise<ReadingProgress> {
   const [data] = await db

@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import ePub from "epubjs";
-import type { Book, Rendition, Location, Contents } from "epubjs";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useGesture } from "@use-gesture/react";
-import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
+import ePub from "epubjs";
+import type { Book, Contents, Location, Rendition } from "epubjs";
 import { ArrowDown, ArrowUp } from "lucide-react";
+
+import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
 
 interface EpubViewerProps {
   bookId: string;

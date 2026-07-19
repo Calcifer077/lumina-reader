@@ -1,10 +1,9 @@
 // This route will handle both get progress and save progress
-
 import { NextRequest, NextResponse } from "next/server";
-import type { ApiResponse } from "@/app/_lib/types";
-import type { ReadingProgress } from "@/app/_db/schema";
 
+import type { ReadingProgress } from "@/app/_db/schema";
 import { getProgress, saveProgress } from "@/app/_lib/progress";
+import type { ApiResponse } from "@/app/_lib/types";
 
 interface RouteParams {
   params: { bookId: string };

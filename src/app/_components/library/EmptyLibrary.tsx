@@ -1,11 +1,12 @@
 import React from "react";
+
 import {
-  Plus,
-  Upload,
   Compass,
+  EyeOff,
+  Plus,
   Smartphone,
   Sparkles,
-  EyeOff,
+  Upload,
 } from "lucide-react";
 
 export default function EmptyLibraryState(): React.ReactElement {

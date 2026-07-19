@@ -2,12 +2,13 @@
 
 import React, { useRef, useState } from "react";
 
-import { useOnClickOutside } from "@/app/_lib/hooks/useOnClickOutisde";
-import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
-import { Button } from "@/components/ui/button";
 import { Camera, UploadCloud, X } from "lucide-react";
-import { updateProfilePicture } from "@/app/_lib/userDetails";
 import { toast } from "sonner";
+
+import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
+import { useOnClickOutside } from "@/app/_lib/hooks/useOnClickOutisde";
+import { updateProfilePicture } from "@/app/_lib/userDetails";
+import { Button } from "@/components/ui/button";
 
 interface UploadProfilePictureModalProps {
   open?: boolean;

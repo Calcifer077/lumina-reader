@@ -1,28 +1,28 @@
 "use client";
 
 import React, {
-  useState,
+  type ChangeEvent,
+  useCallback,
   useEffect,
   useRef,
-  useCallback,
-  type ChangeEvent,
+  useState,
 } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 import { CloudAlert, CloudCheck, RefreshCw } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
+
+import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
+import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { motion, AnimatePresence } from "motion/react";
-import { Button } from "@/components/ui/button";
-
-import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
-import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 

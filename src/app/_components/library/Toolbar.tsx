@@ -1,11 +1,11 @@
 "use client";
 
+import { FaListUl } from "react-icons/fa";
+import { MdGridView } from "react-icons/md";
+
 import { useRouter, useSearchParams } from "next/navigation";
 
 import CustomSelect from "@/app/_components/ui/custom-select";
-
-import { MdGridView } from "react-icons/md";
-import { FaListUl } from "react-icons/fa";
 
 const selectOptions = [
   { text: "recently added", value: "recently_added" },
