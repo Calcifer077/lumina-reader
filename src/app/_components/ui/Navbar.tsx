@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useTheme } from "@/app/_lib/hooks/useTheme";
 
 import { IoMdCloudUpload } from "react-icons/io";
@@ -26,7 +27,7 @@ export default function Navbar({ profilePicturePath }: NavbarProps) {
     <>
       <nav className="fixed top-0 flex justify-between items-center w-full h-18 px-4 bg-background border-b border-border z-50">
         <div className="font-extrabold uppercase text-primary tracking-normal text-lg md:text-xl">
-          Lumina Reader
+          <Link href={"/library"}>Lumina Reader</Link>
         </div>
 
         <div className="flex space-x-4 items-center">
