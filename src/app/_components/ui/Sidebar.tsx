@@ -5,7 +5,6 @@ import { HiOutlineDocumentDuplicate, HiOutlineBookOpen } from "react-icons/hi2";
 import { LuHistory } from "react-icons/lu";
 import { MdOutlinePictureAsPdf, MdOutlineSettings } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import Link from "next/link";
 
 const menuItems = [
@@ -19,7 +18,7 @@ const menuItems = [
   {
     name: "Recent",
     icon: <LuHistory className="h-5 w-5" />,
-    visibleInMobileAndTablet: true,
+    visibleInMobileAndTablet: false,
     value: "recently_opened",
   },
   {
@@ -42,7 +41,7 @@ const bottomLeftMenuItems = [
     icon: <MdOutlineSettings className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
     href: "settings",
-    value: "",
+    value: "settings",
   },
 ];
 
@@ -50,13 +49,11 @@ export default function Sidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [value, setValue] = useState("recently_added");
+  const value = searchParams.get("sort") || "";
 
-  function changeValue(value: string) {
+  function changeValue(newValue: string) {
     const params = new URLSearchParams(searchParams);
-    params.set("sort", value);
-
-    setValue(value);
+    params.set("sort", newValue);
 
     router.push(`?${params.toString()}`);
   }
@@ -81,8 +78,13 @@ export default function Sidebar() {
         {[...menuItems, ...bottomLeftMenuItems]
           .filter((item) => item.visibleInMobileAndTablet)
           .map((item) => {
-            const className =
-              "flex flex-col items-center gap-1 text-muted-foreground transition-colors hover:text-primary";
+            const isActive = item.value === value;
+
+            const className = `flex flex-col items-center gap-1 transition-colors ${
+              isActive
+                ? "text-primary"
+                : "text-muted-foreground hover:text-primary"
+            }`;
 
             const content = (
               <>
@@ -118,13 +120,18 @@ export default function Sidebar() {
         {/* Main Menu */}
         <nav className="mt-8 space-y-1">
           {menuItems.map((item) => {
-            const className =
-              "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30";
+            const isActive = item.value === value;
+
+            const className = `flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-primary/30 text-on-primary"
+                : "text-muted-foreground hover:bg-primary/10"
+            }`;
 
             const content = (
               <>
                 {item.icon}
-                <span className="text-[10px]">{item.name}</span>
+                <span className="text-[12px]">{item.name}</span>
               </>
             );
 
@@ -150,7 +157,7 @@ export default function Sidebar() {
             <Link href={item.href} key={item.name}>
               <button className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30">
                 {item.icon}
-                <span>{item.name}</span>
+                <span className="text-[14px]">{item.name}</span>
               </button>
             </Link>
           ))}
