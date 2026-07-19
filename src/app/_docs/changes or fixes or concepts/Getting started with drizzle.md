@@ -21,7 +21,7 @@ The preferred folder for schema is `_db/schema.ts`. You can create it anywhere y
 
 ```ts
 // _db/schema.ts
-import { integer, text, timestamp, uuid, pgTable } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const books = pgTable("books", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -44,7 +44,15 @@ export const readingProgress = pgTable("reading_progress", {
   location: text("location").notNull(), // page number (PDF) or CFI string (EPUB)
   updated_at: timestamp("updated_at").defaultNow(),
 });
+
+export const userDetails = pgTable("user_details", {
+  email: text("email"),
+  name: text("name"),
+  profilePicturePath: text("profile_picture_path"),
+});
 ```
+
+_Note: this application is not a SAAS product, due to which there is no auth and stuff. There is only one user with some id, whose settings (profile picture and stuff) are saved in db. _
 
 ## Connect Drizzle ORM to Supabase
 
@@ -71,8 +79,8 @@ We will create a config file (`config.drizzle.ts`) for Drizzle so that we can mi
 
 ```ts
 // drizzle.config.ts
-import { defineConfig } from "drizzle-kit";
 import "dotenv/config";
+import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   dialect: "postgresql",
@@ -107,3 +115,9 @@ npx drizzle-kit migrate
 Drizzle will connect to your supabase database and execute the sql.
 
 If for any reason it doesn't work, the most probable cause is URL. Instead of the URL given in project homepage, take from the connect tab.
+
+### We can also directly connect to Supabase instead of creating migrations
+
+```shell
+npx drizzle-kit push
+```
