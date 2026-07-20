@@ -155,6 +155,41 @@ export async function updateBookImage(
   }
 }
 
+export async function deleteAllBooks(): Promise<boolean> {
+  try {
+    const idsFromStorage: string[] = [];
+
+    await db.transaction(async (tx) => {
+      const data = await tx
+        .select({ id: books.id, id_from_storage: books.id_from_storage })
+        .from(books);
+
+      for (const obj of data) {
+        await tx.delete(books).where(eq(books.id, obj.id));
+        idsFromStorage.push(obj.id_from_storage);
+      }
+    });
+
+    // Only reached if ALL DB deletes succeeded and committed
+    for (const idFromStorage of idsFromStorage) {
+      const { data: files } = await supabase.storage
+        .from("books")
+        .list(idFromStorage);
+
+      if (files && files.length > 0) {
+        const filesPath = files.map((f) => `${idFromStorage}/${f.name}`);
+
+        await supabase.storage.from("books").remove(filesPath);
+      }
+    }
+
+    return true;
+  } catch (err) {
+    console.error("There was a problem while deleting all books", err);
+    return false;
+  }
+}
+
 /**
  * Updates books in database
  *

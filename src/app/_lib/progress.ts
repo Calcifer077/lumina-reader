@@ -42,3 +42,23 @@ export async function saveProgress(
     return res;
   }
 }
+
+export async function resetHistoryForABook(bookId: string): Promise<boolean> {
+  try {
+    await db.delete(readingProgress).where(eq(readingProgress.book_id, bookId));
+    return true;
+  } catch (err) {
+    console.log(`Error while reseting history for book: ${bookId}`, err);
+    return false;
+  }
+}
+
+export async function resetHistory(): Promise<boolean> {
+  try {
+    await db.delete(readingProgress);
+    return true;
+  } catch (err) {
+    console.log("Error while resetting history", err);
+    return false;
+  }
+}
