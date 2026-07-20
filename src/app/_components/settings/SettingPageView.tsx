@@ -4,9 +4,12 @@ import { useState } from "react";
 
 import { BookOpen, Minus, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 import UploadProfilePictureModal from "@/app/_components/settings/UploadProfilePictureModal";
+import { deleteAllBooks } from "@/app/_lib/books";
 import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
+import { resetHistory } from "@/app/_lib/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -33,17 +36,41 @@ export default function SettingsPageView({
   const [fontSize, setFontSize] = useLocalStorage("epub-font-size", 120);
   const [zoom, setZoom] = useLocalStorage("pdf-zoom-level", 1);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmResetHistory, setConfirmResetHistory] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 
-  const handleDeleteClick = () => {
+  async function handleDeleteClick() {
     if (confirmingDelete) {
-      // actual delete logic goes here
+      setIsMutating(true);
+      const res = await deleteAllBooks();
+
+      if (res) toast.success("All books deleted successfully.");
+      else toast.error("Something went wrong while deleting books.");
+
       setConfirmingDelete(false);
+      setIsMutating(false);
     } else {
       setConfirmingDelete(true);
     }
-  };
+  }
+
+  async function handleResetHistoryClick() {
+    if (confirmResetHistory) {
+      setIsMutating(true);
+
+      const res = await resetHistory();
+
+      if (res) toast.success("History successfully reseted.");
+      else toast.error("Something went wrong while reseting history.");
+
+      setIsMutating(false);
+      setConfirmResetHistory(false);
+    } else {
+      setConfirmResetHistory(true);
+    }
+  }
 
   return (
     <>
@@ -256,6 +283,7 @@ export default function SettingsPageView({
                 className="mt-auto w-full py-6 font-bold transition-transform duration-100 active:scale-[0.98] cursor-pointer"
                 onClick={handleDeleteClick}
                 onBlur={() => setConfirmingDelete(false)}
+                disabled={isMutating}
               >
                 {confirmingDelete
                   ? "Click again to confirm"
@@ -275,8 +303,13 @@ export default function SettingsPageView({
               <Button
                 variant="outline"
                 className="mt-auto w-full py-6 font-bold transition-transform duration-100 active:scale-[0.98] cursor-pointer"
+                onClick={handleResetHistoryClick}
+                onBlur={() => setConfirmResetHistory(false)}
+                disabled={isMutating}
               >
-                Clear History
+                {confirmResetHistory
+                  ? "Click again to confirm"
+                  : "Clear History"}
               </Button>
             </div>
           </div>
