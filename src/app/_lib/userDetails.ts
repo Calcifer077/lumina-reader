@@ -10,6 +10,10 @@ import { supabase } from "./supabase";
 
 const PLACEHOLDER_USER_IMAGE = "/placeholder-user-image.png";
 
+/**
+ *
+ * @returns user name
+ */
 export async function getUserName(): Promise<string> {
   const [data] = await db
     .select({
@@ -21,6 +25,10 @@ export async function getUserName(): Promise<string> {
   return data?.name || "";
 }
 
+/**
+ *
+ * @returns user email
+ */
 export async function getUserEmail(): Promise<string> {
   const [data] = await db
     .select({ email: userDetails.email })
@@ -30,6 +38,10 @@ export async function getUserEmail(): Promise<string> {
   return data?.email || "";
 }
 
+/**
+ *
+ * @returns path of profile picutre for user
+ */
 async function getProfilePicturePath(): Promise<string> {
   const [data] = await db
     .select({ profilePicturePath: userDetails.profilePicturePath })
@@ -39,6 +51,10 @@ async function getProfilePicturePath(): Promise<string> {
   return data?.profilePicturePath || PLACEHOLDER_USER_IMAGE;
 }
 
+/**
+ *
+ * @returns a signed url for the path of the profile picture.
+ */
 export async function getProfilePictureSignedUrl(): Promise<string> {
   const profilePicturePath = await getProfilePicturePath();
 
@@ -52,6 +68,11 @@ export async function getProfilePictureSignedUrl(): Promise<string> {
   return dataFromStorage?.signedUrl || PLACEHOLDER_USER_IMAGE;
 }
 
+/**
+ *
+ * @param file new profile picture
+ * @returns a boolean depending on whether the operation of updating profile picture was successfull or not.
+ */
 export async function updateProfilePicture(file: File): Promise<boolean> {
   try {
     const pathFromStorage = await getProfilePicturePath();

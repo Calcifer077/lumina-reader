@@ -15,12 +15,20 @@ import { formatDate, formatSize } from "@/app/_lib/utils";
 
 import { supabase } from "./supabase";
 
+/**
+ *
+ * @returns number of total books
+ */
 export async function getTotalBooks(): Promise<number> {
   const [data] = await db.select({ total: count() }).from(books);
 
   return data.total;
 }
 
+/**
+ *
+ * @returns all books as `BookFromApi` data type. Check it in types file under '_lib' folder.
+ */
 export async function getBooks(): Promise<BookFromApi[]> {
   const data = await db.select().from(books);
 
@@ -56,6 +64,11 @@ export async function getBooks(): Promise<BookFromApi[]> {
   return res;
 }
 
+/**
+ *
+ * @param id the id of the book that needs to be fetched
+ * @returns the book as `BookFromApi`. Check it out under '_lib' folder.
+ */
 export async function getBook(id: string): Promise<BookFromApi> {
   const [data] = await db.select().from(books).where(eq(books.id, id));
   let cover = "";
@@ -83,6 +96,11 @@ export async function getBook(id: string): Promise<BookFromApi> {
   return res;
 }
 
+/**
+ *
+ * @param id The id the book for whom data needs to be fetched.
+ * @returns format of the book and signed url for access as a object.
+ */
 export async function getFormatAndSignedUrl(
   id: string,
 ): Promise<{ signedUrl: string | null; format: string | null } | null> {
@@ -107,6 +125,12 @@ export async function getFormatAndSignedUrl(
   };
 }
 
+/**
+ *
+ * @param id The id the book for whom data needs to be fetched.
+ * @returns Storage id of the book
+ * It is not exported, it just acts like a helper function
+ */
 async function getBookStorageId(id: string): Promise<string | boolean> {
   const [data] = await db
     .select({ idFromStorage: books.id_from_storage })
@@ -116,6 +140,12 @@ async function getBookStorageId(id: string): Promise<string | boolean> {
   return data.idFromStorage;
 }
 
+/**
+ *
+ * @param bookId The id of the book that needs to be updated.
+ * @param file The new cover image of book
+ * @returns a boolean depending on whether the operation of updating book cover image was successfull or not.
+ */
 export async function updateBookImage(
   bookId: string,
   file: File,
@@ -155,6 +185,11 @@ export async function updateBookImage(
   }
 }
 
+/**
+ *
+ * @returns a boolean depending on whether the opeartion of deleting all books was successfull or not.
+ * For more detail check under '_docs/changes or fixes or concepts/Deletion of all books.md'
+ */
 export async function deleteAllBooks(): Promise<boolean> {
   try {
     const idsFromStorage: string[] = [];
