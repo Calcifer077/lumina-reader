@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import DangerAlertDialog from "@/app/_components/book/DangerAlertDialog";
 import { deleteBook, updateBook, updateBookImage } from "@/app/_lib/books";
+import { resetHistoryForABook } from "@/app/_lib/progress";
 import type { BookFromApi } from "@/app/_lib/types";
 import { Button } from "@/components/ui/button";
 
@@ -65,8 +66,14 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
     setIsMutating(false);
   }
 
-  function handleResetHistory() {
+  async function handleResetHistory() {
     setIsMutating(true);
+
+    const res = await resetHistoryForABook(book.id);
+
+    if (res) toast.success("Book reading history was reset.");
+    else toast.error("Something went wrong while reseting history");
+
     setIsMutating(false);
   }
 
