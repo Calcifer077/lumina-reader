@@ -40,6 +40,30 @@ export async function getUserEmail(): Promise<string> {
 
 /**
  *
+ * @param userName new name for user
+ * updates user name in db
+ */
+export async function updateUserName(userName: string) {
+  await db
+    .update(userDetails)
+    .set({ name: userName })
+    .where(eq(userDetails.id, 1));
+}
+
+/**
+ *
+ * @param email new email for user
+ * updates user email in db
+ */
+export async function updateUserEmail(email: string) {
+  await db
+    .update(userDetails)
+    .set({ email: email })
+    .where(eq(userDetails.id, 1));
+}
+
+/**
+ *
  * @returns path of profile picutre for user
  */
 async function getProfilePicturePath(): Promise<string> {

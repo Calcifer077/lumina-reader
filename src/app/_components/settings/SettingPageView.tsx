@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { BookOpen, Minus, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import UploadProfilePictureModal from "@/app/_components/settings/UploadProfileP
 import { deleteAllBooks } from "@/app/_lib/books";
 import useLocalStorage from "@/app/_lib/hooks/useLocalStorage";
 import { resetHistory } from "@/app/_lib/progress";
+import { updateUserEmail, updateUserName } from "@/app/_lib/userDetails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -21,7 +22,7 @@ interface SettingPageViewProps {
 }
 
 export default function SettingsPageView({
-  userName,
+  userName: userNameApi,
   email,
   profilePicturePath,
 }: SettingPageViewProps) {
@@ -35,11 +36,42 @@ export default function SettingsPageView({
   );
   const [fontSize, setFontSize] = useLocalStorage("epub-font-size", 120);
   const [zoom, setZoom] = useLocalStorage("pdf-zoom-level", 1);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [confirmResetHistory, setConfirmResetHistory] = useState(false);
+
+  const [userName, setUserName] = useState(userNameApi);
+  const [userEmail, setUserEmail] = useState(email);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
 
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmResetHistory, setConfirmResetHistory] = useState(false);
+
+  const userNameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userEmailTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  async function handleUserNameChange(e: { target: { value: string } }) {
+    const newValue = e.target.value;
+    setUserName(newValue);
+
+    if (userNameTimerRef.current) {
+      clearTimeout(userNameTimerRef.current);
+    }
+
+    userNameTimerRef.current = setTimeout(() => updateUserName(newValue), 2000);
+  }
+
+  function handleUserEmailChange(e: { target: { value: string } }) {
+    const newValue = e.target.value;
+    setUserEmail(newValue);
+
+    if (userEmailTimerRef.current) {
+      clearTimeout(userEmailTimerRef.current);
+    }
+
+    userEmailTimerRef.current = setTimeout(
+      () => updateUserEmail(newValue),
+      2000,
+    );
+  }
 
   async function handleDeleteClick() {
     if (confirmingDelete) {
@@ -104,11 +136,13 @@ export default function SettingsPageView({
               <Input
                 placeholder="Name"
                 value={userName}
+                onChange={handleUserNameChange}
                 className="max-w-sm bg-surface text-on-surface-variant transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-primary"
               />
               <Input
                 placeholder="Email"
-                value={email}
+                value={userEmail}
+                onChange={handleUserEmailChange}
                 className="max-w-sm bg-surface text-on-surface-variant transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-primary"
               />
             </div>
