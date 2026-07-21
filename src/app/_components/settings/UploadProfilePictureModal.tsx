@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 
 import { Camera, UploadCloud, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { useKeyPress } from "@/app/_lib/hooks/useKeyPress";
@@ -19,6 +20,8 @@ export default function UploadProfilePictureModal({
   open = false,
   onClose = () => {},
 }: UploadProfilePictureModalProps) {
+  const router = useRouter();
+
   const [preview, setPreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -59,6 +62,7 @@ export default function UploadProfilePictureModal({
       toast.error("Updating profile picture failed");
     }
 
+    router.refresh();
     setFile(null);
   }
 
