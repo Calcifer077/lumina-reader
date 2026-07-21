@@ -6,18 +6,31 @@ import type { BookFromApi } from "@/app/_lib/types";
 export default async function ListView({
   booksPromise,
   sort,
+  search,
 }: {
   booksPromise: Promise<BookFromApi[]>;
   sort: string;
+  search: string;
 }) {
   const books = await booksPromise;
 
+  const query = search.trim().toLowerCase();
+
+  const searchedBooks =
+    query === ""
+      ? books
+      : books.filter(
+          (b) =>
+            b.title.toLowerCase().includes(query) ||
+            b.author.toLowerCase().includes(query),
+        );
+
   const filteredBooks =
     sort === "pdf"
-      ? books.filter((b) => b.format === "pdf")
+      ? searchedBooks.filter((b) => b.format === "pdf")
       : sort === "epub"
-        ? books.filter((b) => b.format === "epub")
-        : books;
+        ? searchedBooks.filter((b) => b.format === "epub")
+        : searchedBooks;
 
   const sortedBooks = [...filteredBooks].sort((a, b) => {
     switch (sort) {

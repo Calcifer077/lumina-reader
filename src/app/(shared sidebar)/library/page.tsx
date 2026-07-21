@@ -15,11 +15,16 @@ type Props = {
   searchParams: Promise<{
     view?: "grid" | "list";
     sort?: string;
+    search?: string;
   }>;
 };
 
 export default async function LibraryPage({ searchParams }: Props) {
-  const { view = "grid", sort = "recently_added" } = await searchParams;
+  const {
+    view = "grid",
+    sort = "recently_added",
+    search = "",
+  } = await searchParams;
   console.log(sort);
   const totalBooks = await getTotalBooks();
 
@@ -36,13 +41,21 @@ export default async function LibraryPage({ searchParams }: Props) {
             {/* ALL THE BOOKS */}
             {view === "grid" && (
               <Suspense fallback={<GridViewSkeleton />}>
-                <GridView booksPromise={booksPromise} sort={sort} />
+                <GridView
+                  booksPromise={booksPromise}
+                  sort={sort}
+                  search={search}
+                />
               </Suspense>
             )}
 
             {view === "list" && (
               <Suspense fallback={<ListViewSkeleton />}>
-                <ListView booksPromise={booksPromise} sort={sort} />
+                <ListView
+                  booksPromise={booksPromise}
+                  sort={sort}
+                  search={search}
+                />
               </Suspense>
             )}
           </div>

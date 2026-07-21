@@ -7,6 +7,7 @@ import { IoMdCloudUpload } from "react-icons/io";
 import { Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import UploadDocumentsModal from "@/app/_components/ui/UploadDocumentsModal";
 import { useTheme } from "@/app/_lib/hooks/useTheme";
@@ -20,6 +21,20 @@ interface NavbarProps {
 export default function Navbar({ profilePicturePath }: NavbarProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const { darkMode, toggle } = useTheme();
+  const [searchInput, setSearchInput] = useState("");
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  function handleSearchInputChange(e: { target: { value: string } }) {
+    setSearchInput(e.target.value);
+    const searchValue = e.target.value;
+
+    const params = new URLSearchParams(searchParams);
+    params.set("search", searchValue);
+
+    router.push(`?${params.toString()}`);
+  }
 
   return (
     <>
@@ -34,6 +49,8 @@ export default function Navbar({ profilePicturePath }: NavbarProps) {
             <Input
               placeholder="Search your library..."
               className="pl-10 h-10"
+              value={searchInput}
+              onChange={handleSearchInputChange}
             />
           </div>
 
