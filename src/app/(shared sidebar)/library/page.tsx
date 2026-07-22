@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 
+import { Metadata } from "next";
+
 import EmptyLibrary from "@/app/_components/library/EmptyLibrary";
 import GridView from "@/app/_components/library/GridView";
 import GridViewSkeleton from "@/app/_components/library/GridViewSkeleton";
@@ -10,6 +12,10 @@ import ToolbarSkeleton from "@/app/_components/library/ToolbarSkeleton";
 import { getBooks, getTotalBooks } from "@/app/_lib/books";
 
 // import type { BookFromApi } from "@/app/_lib/types";
+
+export const metadata: Metadata = {
+  title: "Lumina - library",
+};
 
 type Props = {
   searchParams: Promise<{
