@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { books } from "@/app/_db/schema";
 import type { Book } from "@/app/_db/schema";
-import { getEpubPageCount, getPdfPageCount } from "@/app/_lib/books";
+import {
+  getEpubCoverImage,
+  getEpubPageCount,
+  getPdfPageCount,
+} from "@/app/_lib/books";
 import { db } from "@/app/_lib/db";
 import { supabase } from "@/app/_lib/supabase";
 import type { ApiResponse } from "@/app/_lib/types";
@@ -62,7 +66,7 @@ export async function POST(
         ? await getPdfPageCount(buffer)
         : await getEpubPageCount(buffer);
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadBookError } = await supabase.storage
       .from("books")
       .upload(filePath, buffer, {
         contentType:
@@ -71,14 +75,44 @@ export async function POST(
         upsert: false,
       });
 
-    if (uploadError) {
+    if (uploadBookError) {
       return NextResponse.json(
         {
           success: false,
-          error: `Storage upload failed: ${uploadError.message}`,
+          error: `Storage upload failed: ${uploadBookError.message}`,
         },
         { status: 500 },
       );
+    }
+
+    let cover;
+    let coverFilePath = "";
+
+    if (ext === "epub") {
+      cover = await getEpubCoverImage(buffer);
+    }
+
+    if (cover?.data) {
+      coverFilePath = `${bookId}/coverUrl`;
+
+      const { error: uploadCoverImageError } = await supabase.storage
+        .from("books")
+        .upload(coverFilePath, cover.data, {
+          contentType:
+            file.type ||
+            (ext === "pdf" ? "application/pdf" : "application/epub+zip"),
+          upsert: false,
+        });
+
+      if (uploadCoverImageError) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Storage upload failed: ${uploadCoverImageError.message}`,
+          },
+          { status: 500 },
+        );
+      }
     }
 
     const [newBook] = await db
@@ -90,7 +124,7 @@ export async function POST(
         format: ext,
         id_from_storage: bookId,
         file_path: filePath,
-        cover_url: "",
+        cover_url: coverFilePath,
         file_size: buffer.byteLength,
         total_pages: totalPages,
       })

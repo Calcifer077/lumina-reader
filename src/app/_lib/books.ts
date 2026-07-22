@@ -346,3 +346,37 @@ function openEpub(filePath: string): Promise<EPub> {
     epub.parse();
   });
 }
+
+function getImage(
+  epub: EPub,
+  id: string,
+): Promise<{ data: Buffer | undefined; mimeType: string | undefined }> {
+  return new Promise((resolve, reject) => {
+    epub.getImage(id, (err, data, mimeType) => {
+      if (err) return reject(err);
+      resolve({ data, mimeType });
+    });
+  });
+}
+
+export async function getEpubCoverImage(
+  buffer: Buffer,
+): Promise<{ data: Buffer | undefined; mimeType: string | undefined } | null> {
+  const tmpPath = path.join(tmpdir(), `${randomUUID()}.epub`);
+  await writeFile(tmpPath, buffer);
+
+  try {
+    const epub = await openEpub(tmpPath);
+
+    const coverId = epub.metadata.cover; // manifest id, e.g. "cover-image"
+    if (!coverId) return null;
+
+    const { data, mimeType } = await getImage(epub, coverId);
+    return { data, mimeType };
+  } catch (err) {
+    console.error("Failed to extract EPUB cover:", err);
+    return null;
+  } finally {
+    await unlink(tmpPath).catch(() => {});
+  }
+}
