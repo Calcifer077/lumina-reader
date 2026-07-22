@@ -89,12 +89,13 @@ export default function Navbar({ profilePicturePath }: NavbarProps) {
             </div>
           </Button>
 
-          <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-primary relative">
             <Image
               src={profilePicturePath}
               alt="Profile"
-              width={40}
-              height={40}
+              fill
+              sizes="40px"
+              className="object-cover"
             />
           </div>
         </div>
