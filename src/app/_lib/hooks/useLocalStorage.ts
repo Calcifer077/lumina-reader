@@ -2,20 +2,28 @@
 
 import { useEffect, useState } from "react";
 
-function useLocalStorage<T>(key: string, initialValue: T) {
-  const [value, setValue] = useState<T>(initialValue);
+function readValue<T>(key: string, initialValue: T): T {
+  if (typeof window === "undefined") return initialValue;
 
-  useEffect(() => {
+  try {
     const saved = window.localStorage.getItem(key);
+    return saved ? (JSON.parse(saved) as T) : initialValue;
+  } catch (err) {
+    console.error(`Error reading localStorage key "${key}":`, err);
+    return initialValue;
+  }
+}
 
-    if (saved) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setValue(JSON.parse(saved));
-    }
-  }, [key]);
+function useLocalStorage<T>(key: string, initialValue: T) {
+  // Lazy initializer runs once, synchronously, before first paint.
+  const [value, setValue] = useState<T>(() => readValue(key, initialValue));
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    try {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (err) {
+      console.error(`Error writing localStorage key "${key}":`, err);
+    }
   }, [key, value]);
 
   return [value, setValue] as const;
