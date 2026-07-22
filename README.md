@@ -1,4 +1,4 @@
-# 📚 Lumina Reader
+# Lumina Reader
 
 A personal, self-hosted ebook reader. Upload PDF and EPUB files, read them in your browser, and pick up exactly where you left off — no accounts, no multi-tenant complexity, just your books on your own Supabase project.
 
@@ -6,7 +6,7 @@ A personal, self-hosted ebook reader. Upload PDF and EPUB files, read them in yo
 
 ---
 
-## ✨ Features
+## Features
 
 - Upload PDF and EPUB files
 - In-browser reading for both formats (PDF.js / epub.js)
@@ -18,7 +18,7 @@ A personal, self-hosted ebook reader. Upload PDF and EPUB files, read them in yo
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer          | Technology                                                 |
 | -------------- | ---------------------------------------------------------- |
@@ -31,9 +31,13 @@ A personal, self-hosted ebook reader. Upload PDF and EPUB files, read them in yo
 | PDF Rendering  | [React PDF](https://www.npmjs.com/package/react-pdf)       |
 | EPUB Rendering | [React Reader](https://www.npmjs.com/package/react-reader) |
 
+## Demo Video
+
+![Demo video](https://youtu.be/6TkdhcLCWU0)
+
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 lumina-reader/
@@ -131,7 +135,7 @@ lumina-reader/
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 **`books`** — one row per uploaded book (title, author, format, storage path, cover, size, page count, timestamps).
 
@@ -141,7 +145,7 @@ Schema lives in `/db/schema.ts` and is managed with Drizzle Kit migrations.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -151,9 +155,9 @@ Schema lives in `/db/schema.ts` and is managed with Drizzle Kit migrations.
 ### 1. Clone and install
 
 ```bash
-git clone <your-repo-url> ebook-reader
-cd ebook-reader
-npm install
+git clone https://github.com/Calcifer077/lumina-reader.git
+cd lumina-reader
+pnpm install
 ```
 
 ### 2. Configure environment variables
@@ -175,7 +179,7 @@ You'll find these in your Supabase project under **Settings → API** and **Sett
 Push the Drizzle schema to your Supabase Postgres instance:
 
 ```bash
-npx drizzle-kit push
+pnpm exec drizzle-kit push
 ```
 
 This creates the `books` and `reading_progress` tables.
@@ -187,20 +191,22 @@ In your Supabase dashboard, go to **Storage** and create a new bucket named `boo
 ### 5. Run the dev server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Visit [http://localhost:3000/library](http://localhost:3000/library) to start uploading books.
 
 ---
 
-## 🔒 How File Access Works
+## How File Access Works
 
 Since there's no authentication, the `books` storage bucket is kept private. The app generates a signed URL (valid for 1 hour) for a file only when the reader actually needs it, rather than exposing a public URL.
 
-## 🔄 How Progress Saving Works
+## How Progress Saving Works
 
 Reading position is saved via a debounced API call (2 seconds after you stop moving) directly to Postgres, with a `localStorage` fallback so the reader can resume instantly even before the database call completes. On load, the app tries the database first and falls back to `localStorage` if that fails.
+
+_Note: Most of the concepts used in this project are mentioned under 'src/app/\_docs'_
 
 ---
 
