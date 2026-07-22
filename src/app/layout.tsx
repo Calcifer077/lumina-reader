@@ -32,6 +32,7 @@ const literata = Literata({
 export const metadata: Metadata = {
   title: "Lumina",
   description: "Personal Ebook Reader",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
