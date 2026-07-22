@@ -6,14 +6,14 @@ import { getProgress, saveProgress } from "@/app/_lib/progress";
 import type { ApiResponse } from "@/app/_lib/types";
 
 interface RouteParams {
-  params: { bookId: string };
+  params: Promise<{ bookId: string }>;
 }
 
 export async function GET(
   _req: NextRequest,
   { params }: RouteParams,
 ): Promise<NextResponse<ApiResponse<ReadingProgress | null>>> {
-  const { bookId } = params;
+  const { bookId } = await params;
 
   try {
     const progress = await getProgress(bookId);
