@@ -118,14 +118,14 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
               className="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex items-center justify-center group"
               onClick={handleBookImageChange}
             >
-              <div className="w-full aspect-2/3 rounded-md relative">
+              <div className="w-full aspect-2/3 rounded-sm relative">
                 <Image
                   src={book.coverUrl}
                   alt="Book cover url"
                   fill
-                  className="object-cover rounded-md"
+                  className="object-cover rounded-sm"
                 />
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/60 transition-opacity duration-150 roudned-md flex flex-col items-center justify-center">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/60 transition-opacity duration-150 rounded-sm flex flex-col items-center justify-center">
                   <Button className="cursor-pointer rounded-md px-4">
                     {" "}
                     <Upload /> <span>Upload Image (&lt;1mb)</span>
