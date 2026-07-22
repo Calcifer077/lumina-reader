@@ -33,7 +33,7 @@ A personal, self-hosted ebook reader. Upload PDF and EPUB files, read them in yo
 
 ## Demo Video
 
-![Demo video](https://youtu.be/6TkdhcLCWU0)
+[![Watch the demo](https://img.youtube.com/vi/6TkdhcLCWU0/maxresdefault.jpg)](https://www.youtube.com/watch?v=6TkdhcLCWU0)
 
 ---
 
