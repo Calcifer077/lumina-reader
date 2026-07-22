@@ -6,7 +6,7 @@ import { LuHistory } from "react-icons/lu";
 import { MdOutlinePictureAsPdf, MdOutlineSettings } from "react-icons/md";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const menuItems = [
   {
@@ -41,18 +41,23 @@ const bottomLeftMenuItems = [
     name: "Settings",
     icon: <MdOutlineSettings className="h-5 w-5" />,
     visibleInMobileAndTablet: true,
-    href: "settings",
+    href: "/settings",
     value: "settings",
   },
 ];
 
 export default function Sidebar() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const value = searchParams.get("sort") || "";
 
+  const isLibraryRoute = pathname === "/library";
+  const isSettingRoute = pathname === "/settings";
+
   function changeValue(newValue: string) {
+    if (!isLibraryRoute) return; // no-op on other routes
     const params = new URLSearchParams(searchParams);
     params.set("sort", newValue);
 
@@ -79,7 +84,7 @@ export default function Sidebar() {
         {[...menuItems, ...bottomLeftMenuItems]
           .filter((item) => item.visibleInMobileAndTablet)
           .map((item) => {
-            const isActive = item.value === value;
+            const isActive = isLibraryRoute && item.value === value;
 
             const className = `flex flex-col items-center gap-1 transition-colors ${
               isActive
@@ -121,12 +126,16 @@ export default function Sidebar() {
         {/* Main Menu */}
         <nav className="mt-8 space-y-1">
           {menuItems.map((item) => {
-            const isActive = item.value === value;
+            // Items without href (Recent/PDF/EPUB) are disabled off the /library route
+            const isDisabled = !item.href && !isLibraryRoute;
+            const isActive = isLibraryRoute && item.value === value;
 
             const className = `flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive
-                ? "bg-primary/30 text-on-primary"
-                : "text-muted-foreground hover:bg-primary/10"
+              isDisabled
+                ? "cursor-not-allowed text-muted-foreground/40"
+                : isActive
+                  ? "bg-primary/30 text-on-primary"
+                  : "text-muted-foreground hover:bg-primary/10"
             }`;
 
             const content = (
@@ -144,6 +153,7 @@ export default function Sidebar() {
               <button
                 key={item.name}
                 className={className}
+                disabled={isDisabled}
                 onClick={() => changeValue(item.value)}
               >
                 {content}
@@ -154,14 +164,25 @@ export default function Sidebar() {
 
         {/* Bottom Menu */}
         <nav className="mt-auto space-y-1 border-t border-border pt-4">
-          {bottomLeftMenuItems.map((item) => (
-            <Link href={item.href} key={item.name}>
-              <button className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/30">
-                {item.icon}
-                <span className="text-[14px]">{item.name}</span>
-              </button>
-            </Link>
-          ))}
+          {bottomLeftMenuItems.map((item) => {
+            const isActive = isSettingRoute;
+
+            return (
+              <Link href={item.href} key={item.name}>
+                <button
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors
+                    ${
+                      isActive
+                        ? "bg-primary/30 text-on-primary"
+                        : "text-muted-foreground hover:bg-primary/10"
+                    }`}
+                >
+                  {item.icon}
+                  <span className="text-[14px]">{item.name}</span>
+                </button>
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </aside>
