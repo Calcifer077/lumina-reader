@@ -6,7 +6,6 @@ import EPub from "epub2";
 import { unlink, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import path from "path";
-import { PDFParse } from "pdf-parse";
 
 import { books } from "@/app/_db/schema";
 import { db } from "@/app/_lib/db";
@@ -304,10 +303,22 @@ export async function deleteBook(id: string): Promise<boolean> {
  */
 export async function getPdfPageCount(buffer: Buffer): Promise<number | null> {
   try {
+    // Polyfill DOMMatrix before pdf-parse (pdfjs-dist) loads
+    if (typeof globalThis.DOMMatrix === "undefined") {
+      // @ts-expect-error minimal stub, pdfjs only needs the constructor to exist
+      globalThis.DOMMatrix = class DOMMatrix {
+        constructor() {}
+      };
+    }
+
+    const { PDFParse } = await import("pdf-parse");
+
     const uint8Buffer = new Uint8Array(buffer);
     const parser = new PDFParse(uint8Buffer);
     const result = await parser.getInfo({ parsePageInfo: true });
     await parser.destroy();
+
+    return result.total;
 
     return result.total;
   } catch (err) {
