@@ -28,11 +28,11 @@ export default function SettingsPageView({
 }: SettingPageViewProps) {
   const [backgroundColor, setBackgroundColor] = useLocalStorage(
     "epub-bg-color",
-    "#f7f9f9",
+    "FBF0D9",
   );
   const [textColor, setTextColor] = useLocalStorage(
     "epub-text-color",
-    "#222222",
+    "3D342D",
   );
   const [fontSize, setFontSize] = useLocalStorage("epub-font-size", 120);
   const [zoom, setZoom] = useLocalStorage("pdf-zoom-level", 1);
