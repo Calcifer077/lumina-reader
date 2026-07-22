@@ -179,7 +179,7 @@ export default function UploadProfilePictureModal({
             onClick={onClose}
             className="text-sm font-medium text-on-surface-variant hover:text-on-surface
               active:scale-95 px-3 py-2 rounded-md
-              transition-[color,transform] duration-100"
+              transition-[color,transform] duration-100 cursor-pointer"
           >
             Cancel
           </button>
@@ -188,8 +188,7 @@ export default function UploadProfilePictureModal({
             onClick={handleSave}
             disabled={!file}
             className="text-sm font-medium rounded-md px-4 py-2 bg-primary text-primary-foreground
-              hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none
-              transition-[opacity,transform] duration-100"
+              hover:opacity-90 active:scale-95 disabled:opacity-50 transition-[opacity,transform] duration-100 cursor-pointer"
           >
             Save Photo
           </button>

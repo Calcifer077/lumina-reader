@@ -69,7 +69,7 @@ export default function Navbar({ profilePicturePath }: NavbarProps) {
             aria-label={
               darkMode ? "Switch to light mode" : "Switch to dark mode"
             }
-            className="rounded-full w-9 h-9 border border-border bg-surface-container-high/80 backdrop-blur-md shadow-sm hover:bg-surface-high hover:shadow-md transition-all duration-1200"
+            className="rounded-full w-9 h-9 border border-border bg-surface-container-high/80 backdrop-blur-md shadow-sm hover:bg-surface-high hover:shadow-md transition-all duration-1200 cursor-pointer"
           >
             <div className="relative h-4 w-4">
               <Sun

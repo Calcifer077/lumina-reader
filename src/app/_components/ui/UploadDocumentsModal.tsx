@@ -216,7 +216,7 @@ export default function UploadDocumentsModal({
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="mt-2 rounded-md bg-primary px-4 py-2 text-label-md font-medium text-primary-foreground"
+              className="mt-2 rounded-md bg-primary px-4 py-2 text-label-md font-medium text-primary-foreground cursor-pointer"
             >
               Browse files
             </button>
@@ -296,14 +296,14 @@ export default function UploadDocumentsModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md px-4 py-2 text-label-md font-medium text-on-surface-variant"
+            className="rounded-md px-4 py-2 text-label-md font-medium text-on-surface-variant cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             disabled={!hasUploadable || isSubmitting}
-            className="rounded-md bg-primary px-4 py-2 text-label-md font-medium text-primary-foreground disabled:opacity-40"
+            className="rounded-md bg-primary px-4 py-2 text-label-md font-medium text-primary-foreground disabled:opacity-40 cursor-pointer"
             onClick={handleSubmit}
           >
             {isSubmitting ? "Uploading…" : "Upload to library"}

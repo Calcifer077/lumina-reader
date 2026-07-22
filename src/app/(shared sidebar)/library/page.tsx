@@ -25,7 +25,6 @@ export default async function LibraryPage({ searchParams }: Props) {
     sort = "recently_added",
     search = "",
   } = await searchParams;
-  console.log(sort);
   const totalBooks = await getTotalBooks();
 
   const booksPromise = getBooks();

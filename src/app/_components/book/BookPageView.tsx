@@ -157,7 +157,7 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
             <div className="flex flex-col mt-2">
               <div>
                 <Link href={`/reader/${book.id}`}>
-                  <Button className="mt-4 rounded-md h-14 md:h-10 w-full">
+                  <Button className="mt-4 rounded-md h-14 md:h-10 w-full cursor-pointer">
                     Continue Reading
                   </Button>
                 </Link>
@@ -205,13 +205,13 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
 
               <div className="flex items-center justify-end gap-6 mt-8">
                 <button
-                  className="text-label-md font-label font-medium text-primary hover:underline"
+                  className="text-label-md font-label font-medium text-primary hover:underline cursor-pointer"
                   disabled={isMutating}
                 >
                   Cancel
                 </button>
                 <button
-                  className="h-11 px-5 rounded-md bg-primary text-primary-foreground text-label-md font-label font-medium hover:opacity-90 transition"
+                  className="h-11 px-5 rounded-md bg-primary text-primary-foreground text-label-md font-label font-medium hover:opacity-90 transition cursor-pointer"
                   onClick={handleUpdate}
                   disabled={isMutating}
                 >
