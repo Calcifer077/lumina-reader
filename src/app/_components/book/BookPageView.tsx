@@ -13,6 +13,7 @@ import { deleteBook, updateBook, updateBookImage } from "@/app/_lib/books";
 import { resetHistoryForABook } from "@/app/_lib/progress";
 import type { BookFromApi } from "@/app/_lib/types";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function BookPageView({ book }: { book: BookFromApi }) {
   const [title, setTitle] = useState<string>(book.title);
@@ -56,37 +57,42 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
       return;
     }
 
-    const res = await updateBook(book.id, title, author);
-
     setIsMutating(true);
 
-    if (res) toast.success("Book updated successfully.");
-    else toast.error("Something went wrong while updating the book!");
-
-    setIsMutating(false);
+    try {
+      const res = await updateBook(book.id, title, author);
+      if (res) toast.success("Book updated successfully.");
+      else toast.error("Something went wrong while updating the book!");
+    } finally {
+      setIsMutating(false);
+    }
   }
 
   async function handleResetHistory() {
     setIsMutating(true);
 
-    const res = await resetHistoryForABook(book.id);
+    try {
+      const res = await resetHistoryForABook(book.id);
 
-    if (res) toast.success("Book reading history was reset.");
-    else toast.error("Something went wrong while reseting history");
-
-    setIsMutating(false);
+      if (res) toast.success("Book reading history was reset.");
+      else toast.error("Something went wrong while reseting history");
+    } finally {
+      setIsMutating(false);
+    }
   }
 
   async function handleDelete() {
-    const res = await deleteBook(book.id);
-
     setIsMutating(true);
+    try {
+      const res = await deleteBook(book.id);
 
-    if (res) toast.success("Book deleted successfully.");
-    else toast.error("Something went wrong while deleting the book!");
+      if (res) toast.success("Book deleted successfully.");
+      else toast.error("Something went wrong while deleting the book!");
 
-    router.push("/library");
-    setIsMutating(false);
+      router.push("/library");
+    } finally {
+      setIsMutating(false);
+    }
   }
 
   return (
@@ -210,13 +216,14 @@ export default function BookPageView({ book }: { book: BookFromApi }) {
                 >
                   Cancel
                 </button>
-                <button
+                <Button
                   className="h-11 px-5 rounded-md bg-primary text-primary-foreground text-label-md font-label font-medium hover:opacity-90 transition cursor-pointer"
                   onClick={handleUpdate}
                   disabled={isMutating}
                 >
+                  {isMutating ? <Spinner data-icon="inline-start" /> : null}
                   Save changes
-                </button>
+                </Button>
               </div>
             </div>
 

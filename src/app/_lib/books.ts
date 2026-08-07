@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { count, eq } from "drizzle-orm";
 import EPub from "epub2";
 import { unlink, writeFile } from "fs/promises";
+import { revalidatePath } from "next/cache";
 import { tmpdir } from "os";
 import path from "path";
 
@@ -211,6 +212,9 @@ export async function updateBookImage(
       })
       .where(eq(books.id, bookId));
 
+    revalidatePath(`/book/${bookId}`);
+    revalidatePath("/library");
+
     return true;
   } catch (err) {
     console.error("Error occured while updating cover image", err);
@@ -282,6 +286,9 @@ export async function updateBook(
         author: author,
       })
       .where(eq(books.id, id));
+
+    revalidatePath(`/book/${id}`);
+    revalidatePath("/library");
 
     return true;
   } catch (err) {
