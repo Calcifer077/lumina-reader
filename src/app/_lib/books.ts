@@ -12,6 +12,7 @@ import { db } from "@/app/_lib/db";
 import type { BookFromApi } from "@/app/_lib/types";
 import { formatDate, formatSize } from "@/app/_lib/utils";
 
+import { getProgress } from "./progress";
 import { supabase } from "./supabase";
 
 /**
@@ -31,7 +32,7 @@ export async function getTotalBooks(): Promise<number> {
 export async function getBooks(): Promise<BookFromApi[]> {
   const data = await db.select().from(books);
 
-  //We will convert the books that come from the api to the format that is needed by the frontend.
+  // We will convert the books that come from the api to the format that is needed by the frontend.
 
   const res: BookFromApi[] = [];
 
@@ -44,13 +45,37 @@ export async function getBooks(): Promise<BookFromApi[]> {
 
       if (imageUrl?.data) cover = imageUrl?.data.signedUrl;
     }
+
+    // we also need to send progress to the frontend.
+
+    const progressFromDb = await getProgress(obj.id);
+
+    // progress_percent is now computed and stored at save time
+    // (by PDFReader for pdf, EpubViewer for epub) — no format branching needed here.
+    let progress: number = progressFromDb?.progress_percent ?? 0;
+
+    // if (obj.format === "epub") {
+    //   if (progress > 0) {
+    //     let newProgress = progress / 100;
+    //     newProgress = parseFloat(newProgress.toFixed(2));
+    //     progress = newProgress;
+    //   }
+    // }
+
+    if (obj.format === "pdf") {
+      if (progress > 0 && obj.total_pages) {
+        const newProgress = progress / obj.total_pages;
+        progress = parseFloat(newProgress.toFixed(2));
+      }
+    }
+
     const newObj: BookFromApi = {
       id: obj.id,
       title: obj.title || "",
       author: obj.author || "",
       coverUrl: cover || "/placeholder-book.png",
       format: obj.format,
-      progress: 0,
+      progress: progress,
       fileSize: formatSize(obj.file_size),
       totalPages: obj.total_pages || 0,
       uploadedAt: formatDate(obj.uploaded_at),
@@ -100,11 +125,19 @@ export async function getBook(id: string): Promise<BookFromApi> {
  * @param id The id the book for whom data needs to be fetched.
  * @returns format of the book and signed url for access as a object.
  */
-export async function getFormatAndSignedUrl(
-  id: string,
-): Promise<{ signedUrl: string | null; format: string | null } | null> {
+export async function getFormatAndSignedUrl(id: string): Promise<{
+  signedUrl: string | null;
+  format: string | null;
+  epubLocations: string | null;
+  totalPages: number | null;
+} | null> {
   const [data] = await db
-    .select({ filePath: books.file_path, format: books.format })
+    .select({
+      filePath: books.file_path,
+      format: books.format,
+      epubLocations: books.epub_locations,
+      totalPages: books.total_pages,
+    })
     .from(books)
     .where(eq(books.id, id));
 
@@ -121,6 +154,8 @@ export async function getFormatAndSignedUrl(
   return {
     signedUrl: dataFromStorage.signedUrl,
     format: data.format,
+    epubLocations: data.epubLocations,
+    totalPages: data.totalPages,
   };
 }
 
@@ -165,7 +200,7 @@ export async function updateBookImage(
       });
 
     if (uploadError) {
-      console.log("Error while uploading the file", uploadError);
+      console.error("Error while uploading the file", uploadError);
       return false;
     }
 
@@ -255,6 +290,23 @@ export async function updateBook(
   }
 }
 
+export async function setEpubLocationsForABook(
+  id: string,
+  epubLocations: string,
+): Promise<boolean> {
+  try {
+    await db
+      .update(books)
+      .set({ epub_locations: epubLocations })
+      .where(eq(books.id, id));
+
+    return true;
+  } catch (err) {
+    console.error("There was a problem while setting epub locations", err);
+    return false;
+  }
+}
+
 /**
  * Deletes books from database
  *
@@ -317,8 +369,6 @@ export async function getPdfPageCount(buffer: Buffer): Promise<number | null> {
     const parser = new PDFParse(uint8Buffer);
     const result = await parser.getInfo({ parsePageInfo: true });
     await parser.destroy();
-
-    return result.total;
 
     return result.total;
   } catch (err) {

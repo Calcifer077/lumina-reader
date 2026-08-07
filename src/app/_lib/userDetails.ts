@@ -123,7 +123,7 @@ export async function updateProfilePicture(file: File): Promise<boolean> {
       });
 
     if (uploadError) {
-      console.log("Error while uploading the file", uploadError);
+      console.error("Error while uploading the file", uploadError);
       return false;
     }
 

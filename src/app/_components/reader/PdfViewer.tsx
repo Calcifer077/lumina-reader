@@ -127,6 +127,7 @@ export default function PdfViewer({
           },
           body: JSON.stringify({
             location: pageNumber.toString(),
+            progress_percent: pageNumber,
           }),
         });
 

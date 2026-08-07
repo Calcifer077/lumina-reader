@@ -33,10 +33,16 @@ export async function GET(
 
 interface SaveProgressBody {
   location: string;
+  progress_percent: number;
 }
 
 function isSaveProgressBody(value: unknown): value is SaveProgressBody {
-  return typeof value === "object" && value !== null && "location" in value;
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "location" in value &&
+    "progress_percent" in value
+  );
 }
 
 export async function POST(
@@ -49,14 +55,17 @@ export async function POST(
     const body = await req.json();
 
     if (!isSaveProgressBody(body)) {
-      console.log("one");
       return NextResponse.json(
         { success: false, error: "Expected {location: string}" },
         { status: 400 },
       );
     }
 
-    const res = await saveProgress(bookId, body.location);
+    const res = await saveProgress(
+      bookId,
+      body.location,
+      body.progress_percent,
+    );
 
     return NextResponse.json({ success: true, data: res });
   } catch (err) {

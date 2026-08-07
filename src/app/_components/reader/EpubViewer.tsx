@@ -87,7 +87,7 @@ export default function EpubViewer({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ location: locationStr }),
+          body: JSON.stringify({ location: locationStr, progress_percent: 0 }), // TODO: calculate progress percentage based on location
         });
 
         const data = await res.json();
