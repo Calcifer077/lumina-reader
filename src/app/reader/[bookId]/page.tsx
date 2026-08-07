@@ -21,7 +21,7 @@ export default async function ReaderPage({ params }: Props) {
 
   const { signedUrl, format } = res;
 
-  // can't find the url, we also have a 'not-found' page at this layout.
+  // can't find the url, we also have a 'not-found' page at this laysout.
   if (signedUrl === null) notFound();
 
   return (

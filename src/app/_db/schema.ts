@@ -11,6 +11,7 @@ export const books = pgTable("books", {
   cover_url: text("cover_url"), // optional extracted cover
   file_size: integer("file_size"), // in bytes
   total_pages: integer("total_pages"), // useful for progress %
+  epub_locations: text("epub_locations"),
   uploaded_at: timestamp("uploaded_at").defaultNow(),
   last_opened_at: timestamp("last_opened_at"),
 });
@@ -20,7 +21,8 @@ export const readingProgress = pgTable("reading_progress", {
   book_id: uuid("book_id")
     .notNull()
     .references(() => books.id, { onDelete: "cascade" }),
-  location: text("location").notNull(), // page number (PDF) or CFI string (EPUB)
+  location: text("location").notNull(), // page number (PDF) or CFI string (EPUB),
+  progress_percent: integer("progress_percent"),
   updated_at: timestamp("updated_at").defaultNow(),
 });
 
@@ -34,3 +36,4 @@ export const userDetails = pgTable("user_details", {
 export type Book = InferSelectModel<typeof books>;
 export type NewBook = InferInsertModel<typeof books>;
 export type ReadingProgress = InferSelectModel<typeof readingProgress>;
+export type NewReadingProgress = InferInsertModel<typeof readingProgress>;

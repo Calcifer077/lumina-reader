@@ -29,6 +29,7 @@ export async function getProgress(bookId: string): Promise<ReadingProgress> {
 export async function saveProgress(
   bookId: string,
   location: string,
+  percent: number,
 ): Promise<ReadingProgress> {
   const [data] = await db
     .select()
@@ -37,9 +38,11 @@ export async function saveProgress(
 
   // progress doesn't exist, create one
   if (!data) {
-    const [res] = await db
-      .insert(readingProgress)
-      .values({ book_id: bookId, location: location });
+    const [res] = await db.insert(readingProgress).values({
+      book_id: bookId,
+      location: location,
+      progress_percent: percent,
+    });
 
     return res;
 
@@ -47,7 +50,7 @@ export async function saveProgress(
   } else {
     const [res] = await db
       .update(readingProgress)
-      .set({ location: location })
+      .set({ location: location, progress_percent: percent })
       .where(eq(readingProgress.book_id, bookId));
 
     return res;
@@ -64,7 +67,7 @@ export async function resetHistoryForABook(bookId: string): Promise<boolean> {
     await db.delete(readingProgress).where(eq(readingProgress.book_id, bookId));
     return true;
   } catch (err) {
-    console.log(`Error while reseting history for book: ${bookId}`, err);
+    console.error(`Error while reseting history for book: ${bookId}`, err);
     return false;
   }
 }
@@ -78,7 +81,7 @@ export async function resetHistory(): Promise<boolean> {
     await db.delete(readingProgress);
     return true;
   } catch (err) {
-    console.log("Error while resetting history", err);
+    console.error("Error while resetting history", err);
     return false;
   }
 }
